@@ -1,0 +1,14 @@
+.vertical-align {
+    display: flex;
+    align-items: center;
+}
+
+.inline {
+    display: inline !important;
+}
+
+.navbar .divider-vertical {
+    height: 2px;
+    margin: 0 2px;
+    border-bottom: 1px solid rosybrown;
+}
