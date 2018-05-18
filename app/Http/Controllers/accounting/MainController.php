@@ -1976,6 +1976,7 @@ Your prompt attention to this notice will avoid further proceedings.');
         $debtors = tblDebtor::
         where('DebtorID', '=', $trustActivity->DebtorID)
             ->get();
+//        echo $trustActivity->DateRcvd;
         return view('accounting\trust\editTrustActivity', ['debtors' => $debtors, 'col' => $col,'trustActivity'=>$trustActivity]);
     }
     public function delTrust(Request $request){

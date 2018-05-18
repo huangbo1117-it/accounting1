@@ -38,7 +38,7 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="creditorID">Date Received:</label>
-                        <input type="date" class="form-control" name="dateReceived" id="datee" value="{{$trustActivity->DateRcvd}}" required>
+                        <input type="date" class="form-control" name="dateReceived" data-pp="{{$trustActivity->DateRcvd}}" id="datee" value="{{$trustActivity->DateRcvd}}" required>
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -144,6 +144,13 @@
             var day = ("0" + now.getDate()).slice(-2);
             var month = ("0" + (now.getMonth() + 1)).slice(-2);
             var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
+            
+            var tmp1 = $('#datee').val();
+            // 2018-05-16
+            day = tmp1.substring(8,10);
+            month = tmp1.substring(5,7);
+            today = tmp1;
+            
             $('input[type=date]').val(today);
 
             var w1=new Date(today);
