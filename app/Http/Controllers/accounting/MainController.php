@@ -1052,6 +1052,21 @@ class MainController extends Controller
         $MISCFeeTrustVal=0;
         $CostRecoveredVal=0;
         $temp= tbltemplate::get();
+        
+        foreach ($notes as $note){
+            $date = $note->DateTime;
+//            echo $date;
+            if ( strlen($date) == strlen("2018-04-27 12:25:27") ){
+                // 2018-04-27 12:25:27
+                $yyyy = substr($date, 0,4);
+                $mm = substr($date, 5,2);
+                $dd = substr($date, 8,2);
+                
+                $tmp1 = $mm."/".$dd."/".$yyyy." ".substr($date, 11,8);
+                $note->DateTime = $tmp1;
+            }
+//            $note->DateTime = '111';
+        }
 
 
         return view('accounting\debtors\debtorEditForm', ['creditor'=> $creditor,'sm' => $sm,'cd' => $cd,'col' => $col,
