@@ -233,7 +233,7 @@
         });
         app.controller('myCtrl', function($scope, $http) {
             $scope.showProfile=false;
-
+$scope.user={};
             $scope.loadSearch = function(){
                 var tokenValue = angular.element('input[name="_token"]').attr('value');
                 // $scope.SaleInformation["__RequestVerificationToken"] = tokenValue;

@@ -375,18 +375,19 @@
                         var AgencyNet=0;
                         data.forEach(function(e){
                             NetClient+= e.NetClient;
-                            AgencyNet+= e.AgencyNet;
-                            var OpenDate = new Date(e.DateRcvd);var dd = OpenDate.getDate();var mm = OpenDate.getMonth()+1; //January is 0!
-                            var yyyy = OpenDate.getFullYear();
-                            if(dd<10){dd='0'+dd;}
-                            if(mm<10){mm='0'+mm;}
+                            AgencyNet+= e.AgencyNet;                            
+                            
+                            var tmp1 = e.DateRcvd;
+                            var dd = tmp1.substring(8,10);
+                            var mm = tmp1.substring(5,7);
+                            var yyyy = tmp1.substring(0,4);
                             var OpenDate1 = mm+'/'+dd+'/'+yyyy;
                             e.DateRcvd=OpenDate1;
 
-                                var OpenDate = new Date(e.RelDate);var dd = OpenDate.getDate();var mm = OpenDate.getMonth()+1; //January is 0!
-                                var yyyy = OpenDate.getFullYear();
-                                if(dd<10){dd='0'+dd;}
-                                if(mm<10){mm='0'+mm;}
+                                var tmp1 = e.RelDate;
+                                dd = tmp1.substring(8,10);
+                                mm = tmp1.substring(5,7);
+                                yyyy = tmp1.substring(0,4);
                                 var OpenDate1 = mm+'/'+dd+'/'+yyyy;
                                 e.RelDate=OpenDate1;
 

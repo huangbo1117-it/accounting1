@@ -3862,6 +3862,10 @@ if ($fieldName == 'CheckNumb'){
     public function GetUserCreditor(Request $request){
         return response()->json(\DB::table('userCreditorMaps')->Where('userid','=',$request->id)->get());
     }
+	public function DeleteUserCreditor(Request $request){
+		
+        return response()->json(\DB::table('userCreditorMaps')->Where('userid','=',$request->id)->Where('CreditorID','=',$request->CreditorID)->delete());
+    }
 }
 
 

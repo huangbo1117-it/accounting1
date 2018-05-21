@@ -212,11 +212,33 @@
                     $('#abc').empty();
                     for(var i =0; i< response.length; i++){
                     //<li class="list-group-item">inam</li>
-                        $('#abc').append('<li class="list-group-item">'+ response[i].CreditorID+'</li>');
+                        $('#abc').append('<li class="list-group-item" >'+ response[i].CreditorID+' <span  style="float:right;cursor:pointer"><i class="fa fa-trash" aria-hidden="true" onclick="deleteUserCreditor(\''+ id.trim() +'\',\''+ response[i].CreditorID +'\')"></i></span></li>');
                     }
                 }
             });
         }
+		function deleteUserCreditor(id,CreditorID){
+			if (confirm('Are you sure. You want to delete ' + CreditorID)) {
+				 $.ajax({
+                url: './DeleteUserCreditor/',
+                type: 'GET',
+                data: { 
+				id: id ,
+				CreditorID:CreditorID,
+				},
+                success: function(response)
+                {
+                    console.log(response);
+                    if(response == 1){
+						alert('Deleted Successfully');
+						$('#mainDiv').addClass("col-md-12").removeClass('col-md-8');
+						$('#CreditorDiv').fadeOut('slow');
+					}
+                }
+            });
+			} 
+			
+		}	
 
         function setUserCreditor(e){
             var data = $('#CreditorForm').serializeArray();

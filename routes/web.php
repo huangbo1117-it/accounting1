@@ -149,6 +149,7 @@ Route::get('/AddUser','Accounting\MainController@addUser');
 Route::post('/AddUser','Accounting\MainController@saveUser');
 Route::post('/AddUserCreditor','Accounting\MainController@saveUserCreditor');
 Route::get('/GetUserCreditor','Accounting\MainController@GetUserCreditor');
+Route::get('/DeleteUserCreditor','Accounting\MainController@DeleteUserCreditor');
 
 Route::get('/editUser/{id}','Accounting\MainController@editUser');
 Route::post('/editUser/{id}','Accounting\MainController@editUser');
