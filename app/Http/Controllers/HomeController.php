@@ -42,7 +42,7 @@ class HomeController extends Controller
             ->orWhere('City','like','%'.$request->searchCreditor.'%')
             ->orWhere('Street','like','%'.$request->searchCreditor.'%')
             ->orWhere('Zip','like','%'.$request->searchCreditor.'%')
-            ->paginate(5);
+            ->paginate(5)->appends(['searchCreditor' => $request->searchCreditor]);
             $contacts = tblcontacts::
             where('CreditorID','=',$request->searchCreditor)
                 ->orWhere('ContactID','like','%'.$request->searchCreditor.'%')
@@ -50,7 +50,7 @@ class HomeController extends Controller
                 ->orWhere('State','like','%'.$request->searchCreditor.'%')
                 ->orWhere('Zip','like','%'.$request->searchCreditor.'%')
                 ->orWhere('City','like','%'.$request->searchCreditor.'%')
-                ->paginate(5);
+                ->paginate(5)->appends(['searchCreditor' => $request->searchCreditor]);
         }
         return view('home',['debtor' => $debtor,'contacts' => $contacts]);
 
@@ -78,7 +78,7 @@ class HomeController extends Controller
                 ->orWhere('City','like','%'.$request->searchCreditor.'%')
                 ->orWhere('Street','like','%'.$request->searchCreditor.'%')
                 ->orWhere('Zip','like','%'.$request->searchCreditor.'%')
-                ->paginate(5);
+                ->paginate(5)->appends(['searchCreditor' => $request->searchCreditor]);
             $contacts = tblcontacts::
             where('CreditorID','=',$request->searchCreditor)
                 ->orWhere('ContactID','like','%'.$request->searchCreditor.'%')
@@ -86,7 +86,7 @@ class HomeController extends Controller
                 ->orWhere('State','like','%'.$request->searchCreditor.'%')
                 ->orWhere('Zip','like','%'.$request->searchCreditor.'%')
                 ->orWhere('City','like','%'.$request->searchCreditor.'%')
-                ->paginate(5);
+                ->paginate(5)->appends(['searchCreditor' => $request->searchCreditor]);
         }
 
 

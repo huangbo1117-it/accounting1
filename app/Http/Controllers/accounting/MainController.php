@@ -318,7 +318,7 @@ class MainController extends Controller
             if($filterData == ''){
                 $creditor = tblcreditor::paginate(5);
             }else{*/
-                $creditor= tblcreditor::where('CreditorID','like', '%' . $request->searchCreditor . '%')->paginate(5);
+                $creditor= tblcreditor::where('CreditorID','like', '%' . $request->searchCreditor . '%')->paginate(5)->appends(['searchCreditor' => $request->searchCreditor]);
                // $creditor =DB::select('select * from tblcreditors where CreditorID in ('.$filterData.')')->toArray()->paginate(5);
 
 
@@ -782,7 +782,7 @@ class MainController extends Controller
             return  $this->Export($creditor,'Debtors');
         }
         if($request->searchCreditor == null) {
-            $debtor = tblDebtor::paginate(5);
+            $debtor = tblDebtor::paginate(5)->appends(['searchCreditor' => $request->searchCreditor]);
             //$debtor = new tblDebtor();
         }
         else{
@@ -798,7 +798,7 @@ class MainController extends Controller
                 ->orWhere('City','like','%'.$request->searchCreditor.'%')
                 ->orWhere('Street','like','%'.$request->searchCreditor.'%')
                 ->orWhere('Zip','like','%'.$request->searchCreditor.'%')
-                ->paginate(5);
+                ->paginate(5)->appends(['searchCreditor' => $request->searchCreditor]);
         }
 
         return view('accounting\debtors\debtor', ['debtor' => $debtor]);
@@ -3740,7 +3740,7 @@ if ($fieldName == 'CheckNumb'){
                 ->join('Users','Roles.ID','=','Users.is_permission')
                 ->select('Users.*','Roles.name as groupName')
                 ->where('Users.email','like','%' . $request->searchUser . '%')
-                ->paginate(5);
+                ->paginate(5)->appends(['searchUser' => $request->searchUser]);
            // $creditor= tblcreditor::where('CreditorID','like', '%' . $request->searchCreditor . '%')->paginate(5);
             // $creditor =DB::select('select * from tblcreditors where CreditorID in ('.$filterData.')')->toArray()->paginate(5);
 
