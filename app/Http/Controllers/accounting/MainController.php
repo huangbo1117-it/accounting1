@@ -3801,12 +3801,14 @@ if ($fieldName == 'CheckNumb'){
                 $validatedData = $request->validate([
                     'name' => 'required|string|max:255',
                     'is_permission'=>'required',
+					'password' => 'string|min:6|confirmed',
                 ]);
             $newCreditor = new User();
             $newCreditor->where('id','=',$request->updateUserID)
                 ->update([
                     'name'=>$request->name,
-                    'is_permission'=>$request->is_permission
+                    'is_permission'=>$request->is_permission,
+					'password'=>bcrypt($request->password),
                 ]);
             return redirect('/Users?msg=User Successfully Updated.');
         }

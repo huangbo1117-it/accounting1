@@ -1,7 +1,12 @@
 @extends('layouts.app2')
 
 @section('content')
-    <div class="container">
+<style>
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+}
+</style>
+    <div class="container ng-cloak" >
         <div class="row" ng-init="loadSearch()">
 
             <div >
@@ -17,7 +22,7 @@
 
         </div>
         <br>
-        <div class="row">
+        <div class="row" ng-show='user.CreditorID !=null'>
             <div class="col-md-3" >
                 <div class="single category">
                     <h3 class="side-title">Debtors</h3>
@@ -237,6 +242,10 @@
             $scope.showProfile=false;
 $scope.user={};
             $scope.loadSearch = function(){
+				if($scope.user.CreditorID == undefined){
+					alert('select CreditorID');
+					return;
+				}	
                 var tokenValue = angular.element('input[name="_token"]').attr('value');
                 // $scope.SaleInformation["__RequestVerificationToken"] = tokenValue;
                 $http.get("globalSearch",{
