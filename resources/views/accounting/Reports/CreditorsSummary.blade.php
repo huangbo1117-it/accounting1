@@ -207,19 +207,23 @@
                                 SumOfTotalFees+= e.SumOfTotalFees;
                                 SuitFee+= e.SuitFee;
 
-                                var OpenDate = new Date(e.DateEntered);var dd = OpenDate.getDate();var mm = OpenDate.getMonth()+1; //January is 0!
-                                var yyyy = OpenDate.getFullYear();
-                                if(dd<10){dd='0'+dd;}
-                                if(mm<10){mm='0'+mm;}
+                                                                
+                                var tmp1 = e.DateEntered;
+                                var dd = tmp1.substring(8,10);
+                                var mm = tmp1.substring(5,7);
+                                var yyyy = tmp1.substring(0,4);
                                 var OpenDate1 = mm+'/'+dd+'/'+yyyy;
                                 e.DateEntered= OpenDate1;
+                            
                                 if(e.LastDate == null){e.LastDate= '';}else{
-                                OpenDate = new Date(e.LastDate);var dd = OpenDate.getDate();var mm = OpenDate.getMonth()+1; //January is 0!
-                                var yyyy = OpenDate.getFullYear();
-                                if(dd<10){dd='0'+dd;}
-                                if(mm<10){mm='0'+mm;}
+                                
+                                var tmp1 = e.LastDate;
+                                var dd = tmp1.substring(8,10);
+                                var mm = tmp1.substring(5,7);
+                                var yyyy = tmp1.substring(0,4);
                                 var OpenDate1 = mm+'/'+dd+'/'+yyyy;
                                 e.LastDate= OpenDate1;
+                                
                                 }
                                 e.AmountPlaced = CurrencyFormat( e.AmountPlaced);
                                 e.AmountPaid = CurrencyFormat( e.AmountPaid);

@@ -220,12 +220,14 @@
 
             gridData.forEach(function(e){
                 AmountPlaced+= e.AmountPlaced;
-                var OpenDate = new Date(e.DateEntered);var dd = OpenDate.getDate();var mm = OpenDate.getMonth()+1; //January is 0!
-                var yyyy = OpenDate.getFullYear();
-                if(dd<10){dd='0'+dd;}
-                if(mm<10){mm='0'+mm;}
-                var OpenDate1 = dd+'/'+mm+'/'+yyyy;
+               
                 e.AmountPlaced=CurrencyFormat( e.AmountPlaced);
+                
+                var tmp1 = e.DateEntered;
+                var dd = tmp1.substring(8,10);
+                var mm = tmp1.substring(5,7);
+                var yyyy = tmp1.substring(0,4);
+                var OpenDate1 = mm+'/'+dd+'/'+yyyy;
                 e.DateEntered= OpenDate1;
 
             });
