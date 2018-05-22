@@ -35,7 +35,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="col-md-9" ng-show="showProfile">
+            <div class="col-md-9" ng-show="showProfile" id="showProfile" style="display:none">
                 <div class="col-md-12">
 
 
@@ -221,6 +221,7 @@
     <script src="{{ asset('js/angular.min.js') }}"></script>
 
     <script>
+        
         var app = angular.module('myApp', [], function($interpolateProvider) {
             $interpolateProvider.startSymbol('[[');
             $interpolateProvider.endSymbol(']]');
@@ -240,9 +241,13 @@
         });
         app.controller('myCtrl', function($scope, $http) {
             $scope.showProfile=false;
-$scope.user={};
+            
+            var e = document.getElementById("CreditorDropDown");
+            var strUser = e.options[0].text;
+            $scope.user={CreditorID:strUser};
             $scope.loadSearch = function(){
 				if($scope.user.CreditorID == undefined){
+                                        
 					alert('select CreditorID');
 					return;
 				}	
@@ -276,6 +281,8 @@ $scope.user={};
                         //First function handles success
                         $scope.searchProfile= response.data;
                         $scope.showProfile=true;
+                        //angular.element("#showProfile").css({display:block});
+                        angular.element('#showProfile').css('display', 'block');
                     }, function(response) {
                         //Second function handles error
                         console.log(response.data)

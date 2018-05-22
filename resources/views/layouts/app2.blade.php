@@ -53,7 +53,7 @@
                                 <select class="form-control" ng-model="user.CreditorID" id="CreditorDropDown">
 
                                     @foreach( $Creditors as $ss)
-                                        <option value="{{$ss->CreditorID}}" >{{$ss->CreditorID}}  </option>
+                                        <option value="{{$ss->CreditorID}}" >{{$ss->CreditorID}}</option>
                                     @endforeach
                                 </select>
                             </li>

@@ -3130,6 +3130,8 @@ SELECT tblTrust.DebtorID,  Sum(COALESCE(tblTrust.Intrest,0)+COALESCE(tblTrust.Mi
 
                     if($row->has('tpaymentid') == true && $row->has('debtorid') == true){
                         $isExist = tblTrust::where('TPaymentID','=',$row->tpaymentid)->first();
+                        $id = $row->tpaymentid;
+                        $did = $row->debtorid;
                         if($isExist  ==null){
                             $creditor = new tblTrust();
                             $creditor->DebtorID = $row->debtorid;
