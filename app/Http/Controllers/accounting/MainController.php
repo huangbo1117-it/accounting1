@@ -656,17 +656,20 @@ class MainController extends Controller
     }
     public function contact(Request $request){
         $contacts = null;
+        $creditorID = $request->session()->get('creditorID');
         if($request->searchContact == null) {
             $contacts = tblcontacts::
-                where('CreditorID','=',$request->session()->get('creditorID'))->where('MainManager','=', 0)
-                ->get();
+                where('CreditorID','=',$request->session()->get('creditorID'))->get();
         }
         else{
             $contacts = tblcontacts::
-                where('CreditorID','=','%'.$request->session()->get('creditorID'))->where('MainManager','=', 0)
-                ->get();
+                where('CreditorID','=','%'.$request->session()->get('creditorID'))->get();
         }
-
+        
+//        foreach($contacts as $contact){
+//            var_dump($contact
+//        }
+        
 
         return view('accounting\contacts\contact', ['contacts' => $contacts]);
     }

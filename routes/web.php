@@ -59,6 +59,7 @@ Route::get('/Debtor','Accounting\MainController@debtor');
 Route::get('/AddDebtor','Accounting\MainController@addDebtor');
 Route::get('/AddDebtor/{DID}','Accounting\MainController@addDebtor');
 Route::get('/GetContact','Accounting\MainController@getContact');
+Route::get('/EditDebtor/GetContact','Accounting\MainController@getContact');
 Route::post('/AddDebtor','Accounting\MainController@saveDebtor');
 Route::get('/EditDebtor/{DebtorID}','Accounting\MainController@editDebtor');
 Route::post('/EditDebtor/{DebtorID}','Accounting\MainController@editDebtor');
