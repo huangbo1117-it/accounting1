@@ -345,7 +345,7 @@ class MainController extends Controller
         }
 
 
-
+//        echo 'hello';
         return view('accounting\creditors\creditor', ['creditor' => $creditor]);
     }
     public function addCreditor(){

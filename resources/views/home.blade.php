@@ -113,16 +113,16 @@
                                             <div>{{ $contact->Street }}, {{$contact->City}}, {{$contact->State}} ({{$contact->Zip}})</div>
                                         </td>
                                         <td class="pull-right">
-                                            <form action="/Contacts/{{$cd->CreditorID}}" target="_blank" class="inline">
+                                            <form action="/Contacts/{{$contact->CreditorID}}" target="_blank" class="inline">
                                                 <button type="submit" name="edit" class="btn btn-primary">Other Contacts</button>
                                                 {{ csrf_field() }}
                                             </form>
-                                            <form action="/EditCreditor/{{$cd->CreditorID}}" target="_blank" class="inline">
+                                            <form action="/EditCreditor/{{$contact->CreditorID}}" target="_blank" class="inline">
                                                 <button type="submit" name="edit" class="btn btn-primary">Edit</button>
                                                 {{ csrf_field() }}
                                             </form>
 
-                                            <button type="button" class="btn btn-primary" data-toggle="modal" onclick="getContactName('{{$cd->CreditorID}}')" data-target="#myModal">View</button>
+                                            <button type="button" class="btn btn-primary" data-toggle="modal" onclick="getContactName('{{$contact->CreditorID}}')" data-target="#myModal">View</button>
                                         </td>
                                     </tr>
                                 @endforeach

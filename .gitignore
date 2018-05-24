@@ -12,4 +12,4 @@ yarn-error.log
 .env
 /nbproject/private/
 storage/framework/views/*.php
-*.log
+storage/logs/*.log

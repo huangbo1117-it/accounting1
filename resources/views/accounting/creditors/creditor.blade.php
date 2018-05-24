@@ -104,7 +104,7 @@
 
                 </div>
                     <div class="modal-footer">
-                    <form action="/EditCreditor/{{$cd->CreditorID}}" target="_blank" class="inline">
+                    <form action="/EditCreditor/ddd" target="_blank" class="inline">
                         <button type="submit" name="edit" class="btn btn-primary">Summary Report</button>
                         {{ csrf_field() }}
                     </form>
