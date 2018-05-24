@@ -434,6 +434,9 @@
                                         <td class="table-text">
                                             <a href="/Donwload/{{ $cd->FileID}}" class="btn btn-large" target="_blank"><i class="icon-download-alt"> </i> Download  </a>
                                         </td>
+                                        <td class="table-text">
+                                            <a href="/EditDebtor/Delete/{{ $cd->FileID}}" class="btn btn-large btn-danger" ><i class="icon-download-alt"> </i> Delete  </a>
+                                        </td>
                                     </tr>
                                 @endforeach
                                 </tbody>

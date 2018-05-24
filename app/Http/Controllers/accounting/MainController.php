@@ -1837,6 +1837,13 @@ Your prompt attention to this notice will avoid further proceedings.');
        //
         return redirect('/EditDebtor/'.$request->DebtorID);
     }
+    public function deleteFile(Request $request){
+        $sfile=tblfile::where('FileID','=',$request->FileID)->first();
+        $id = $sfile->DebtorID;
+        tblfile::where('FileID','=',$request->FileID)->delete();
+        //echo $sfile->downloadName;
+        return redirect('/EditDebtor/'.$id);
+    }
     public function DonwloadFile(Request $request){
 
         $sfile=tblfile::where('FileID','=',$request->FileID)->first();
