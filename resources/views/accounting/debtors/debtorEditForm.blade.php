@@ -841,7 +841,7 @@
                     var suitFee =parseFloat($('input[name=suitFee]').val().replace(',','')).toFixed(2);
                     var fees =parseFloat($('input[name=fees]').val().replace(',','')).toFixed(2);
                     placed-=parseFloat(obj.pending).toFixed(2);
-                    costRecover = parseFloat(costRecover) + parseFloat(obj.CostRecoveredVal).toFixed(2);
+                    costRecover = (parseFloat(costRecover) + parseFloat(obj.CostRecoveredVal)).toFixed(2);
                     suitFee+=parseFloat(obj.MISCFeeTrustVal).toFixed(2);
                     fees+=parseFloat(obj.FeesVal).toFixed(2);
                     $('input[name=AmountPaid]').val(parseFloat(obj.pending).toFixed(2));
