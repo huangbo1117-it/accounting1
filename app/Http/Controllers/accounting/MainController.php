@@ -37,6 +37,8 @@ class MainController extends Controller
         $this->middleware('auth');
         $this ->middleware('CheckGroup:Main');
     }
+    
+    private $path_term = "/";
 
     public function collector(Request $request){
         $collectors = null;
@@ -1826,7 +1828,8 @@ Your prompt attention to this notice will avoid further proceedings.');
         if($request->file('importFile')){
             $file= $request->file('importFile');
             $filename= Auth::user()->id.'-D-' . time() . '.' . $file->getClientOriginalExtension();
-            $path= public_path('storage/csv');
+//            $path= public_path("storage".$this->path_term."csv");
+            $path = "storage".$this->path_term."csv";
             $newFile = new tblfile();
             $newFile->DebtorID = $request->DebtorID;
             $newFile->FileName = $file->getClientOriginalName();
@@ -1847,12 +1850,55 @@ Your prompt attention to this notice will avoid further proceedings.');
         $id = $sfile->DebtorID;
         tblfile::where('FileID','=',$request->FileID)->delete();
         //echo $sfile->downloadName;
+        if($request->preFix != null)
+        {
+            return redirect('/Donwload/ChangePrefix/1');
+        }
         return redirect('/EditDebtor/'.$id.'?t=2');
+    }
+    public function ChangePrefix(Request $request){
+        $preFix = $request->preFix;
+        
+        if($request->updateUserID != null)
+        {
+
+            $posts = tblfile::all();
+
+            foreach($posts as $post)
+            {
+                //do something
+                $url = str_replace($preFix, "", $post->url);
+                $url = str_replace("/", $this->path_term, $url);
+                $tblfile = new tblfile();
+                $tblfile->where('FileID', '=', $post->FileID)
+                    ->update(array(
+                        'url'=>$url
+                    ));
+            }
+        }
+        $posts = tblfile::all();
+        foreach($posts as $sfile)
+        {
+            // check existence of file
+            $path=public_path($sfile->url).$this->path_term.$sfile->downloadName;
+            if(file_exists($path)){
+                $sfile->fileExist = true;
+                $sfile->generatedPath = $path;
+            }else{
+                $sfile->fileExist = false;
+                $sfile->generatedPath = $path;
+            }
+        }
+        
+        return view('accounting\download\ChangePrefix', [
+            'preFix'=>$preFix,'files'=>$posts]);
+        
     }
     public function DonwloadFile(Request $request){
 
         $sfile=tblfile::where('FileID','=',$request->FileID)->first();
-        $file=$sfile->url.'/'.$sfile->downloadName;
+//        $file=$sfile->url.$this->path_term.$sfile->downloadName;
+        $file=public_path($sfile->url).$this->path_term.$sfile->downloadName;
         return \Response::download($file);
     }
 

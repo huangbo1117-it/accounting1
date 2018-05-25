@@ -75,6 +75,8 @@ Route::post('/AddActivityCode','Accounting\MainController@saveActivityCode');
 Route::post('/DelActivityCode/{DebtorID}','Accounting\MainController@delActivityCode');
 Route::post('/UploadFile/{DebtorID}','Accounting\MainController@UploadFile');
 Route::get('/Donwload/{FileID}','Accounting\MainController@DonwloadFile');
+Route::get('/Donwload/ChangePrefix/{preFix}','Accounting\MainController@ChangePrefix');
+Route::post('/Donwload/ChangePrefix/{preFix}','Accounting\MainController@ChangePrefix');
 Route::get('/calculationDebit/{DebtorID}','Accounting\MainController@calculationDebit');
 
 Route::get('/Contacts/{creditorID}','Accounting\MainController@contacts');
