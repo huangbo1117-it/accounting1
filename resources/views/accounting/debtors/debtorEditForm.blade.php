@@ -859,6 +859,11 @@
             });
 
             $("#Maskphone").mask("(999) 999-9999");
+            
+            // $contact
+            //$tabIndex
+            var tabIndex = {!! $tabIndex !!};
+            $('.nav-pills li:eq('+ tabIndex+') a').tab('show');
 
         });
         function noteUpdate(id,DebtorID){

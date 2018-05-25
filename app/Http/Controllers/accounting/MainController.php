@@ -1071,7 +1071,11 @@ class MainController extends Controller
 //            $note->DateTime = '111';
         }
 
-
+        
+        $tabIndex = 0;
+        if($request->t){
+            $tabIndex =  $request->t;
+        }
         return view('accounting\debtors\debtorEditForm', ['creditor'=> $creditor,'sm' => $sm,'cd' => $cd,'col' => $col,
             'first'=>$first,
             'previous'=>$previous,
@@ -1086,6 +1090,7 @@ class MainController extends Controller
             'files'=>$files,
             'activityCode'=>$activityCode,
             'contact'=>$contact,
+            'tabIndex'=>$tabIndex, // $request->tabIndex
             'temp'=>$temp]);
 
     }
@@ -1842,7 +1847,7 @@ Your prompt attention to this notice will avoid further proceedings.');
         $id = $sfile->DebtorID;
         tblfile::where('FileID','=',$request->FileID)->delete();
         //echo $sfile->downloadName;
-        return redirect('/EditDebtor/'.$id);
+        return redirect('/EditDebtor/'.$id.'?t=2');
     }
     public function DonwloadFile(Request $request){
 
