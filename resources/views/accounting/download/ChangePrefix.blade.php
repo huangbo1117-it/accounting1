@@ -73,7 +73,8 @@
                                 <td colspan="3">{{$cd->generatedPath}}</td>
                             </tr>
                             <tr>
-                                <td colspan="4">DebtorID &nbsp;&nbsp;&nbsp;&nbsp; {{$cd->DebtorID}}</td>
+                                <td colspan="2">DebtorID &nbsp;&nbsp;&nbsp;&nbsp; {{$cd->DebtorID}}</td>
+                                <td colspan="2">Filename &nbsp;&nbsp;&nbsp;&nbsp; {{$cd->FileName}}</td>
                             </tr>
                             <tr>
                                 <td>
