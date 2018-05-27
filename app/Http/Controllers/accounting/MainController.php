@@ -7,7 +7,7 @@ use App\accounting\Role;
 use App\accounting\RoleRightsField;
 use App\accounting\tblactivitycode;
 use App\accounting\tblattorneys;
-use App\accounting\tblCollector;
+use App\accounting\tblcollector;
 use App\accounting\tblcreditor;
 use App\accounting\tblcontacts;
 use App\accounting\tblDebtor;
@@ -43,20 +43,20 @@ class MainController extends Controller
     public function collector(Request $request){
         $collectors = null;
         if($request->searchCollector == null) {
-            $collectors = tblCollector::get();
+            $collectors = tblcollector::get();
         }
         else{
-            $collectors = tblCollector::
+            $collectors = tblcollector::
                 where('CLastName','like','%'.$request->searchCollector.'%')
                 ->orwhere('CFirstName','like','%'.$request->searchCollector.'%')
                 ->get();
         }
 
 
-        return view('accounting\collector\collector', ['collectors' => $collectors]);
+        return view('accounting/collector/collector', ['collectors' => $collectors]);
     }
     public function addCollector(){
-        return view('accounting\collector\addcollector');
+        return view('accounting/collector/addcollector');
     }
     public function saveCollector(Request $request){
 
@@ -65,7 +65,7 @@ class MainController extends Controller
             'collectorLastName' => 'required|max:191',
         ]);
 
-        $newCollector = new tblCollector();
+        $newCollector = new tblcollector();
         $newCollector->CLastName = $request->collectorLastName;
         $newCollector->CFirstName = $request->collectorFirstName;
         $newCollector->Closing  =$request->closing;
@@ -82,7 +82,7 @@ class MainController extends Controller
                 'collectorLastName' => 'required|max:191',
             ]);
 
-            $collector = new tblCollector();
+            $collector = new tblcollector();
 
             $collector->where('ColID','=',$request->updateCollectorID)
                 ->update(array(
@@ -94,12 +94,12 @@ class MainController extends Controller
             return redirect('/Collector?msg=Collector Successfully Updated.');
         }
 
-        $collector = tblCollector::where('ColID','=',$request->collectorID)->first();
-        return view('accounting\collector\collectorEditForm', ['collector'=> $collector]);
+        $collector = tblcollector::where('ColID','=',$request->collectorID)->first();
+        return view('accounting/collector/collectorEditForm', ['collector'=> $collector]);
 
     }
     public function delCollector(Request $request){
-        tblCollector::where('ColID','=',$request->collectorID)->delete();
+        tblcollector::where('ColID','=',$request->collectorID)->delete();
         return redirect('/Collector?msg=Collector Successfully Deleted.');
     }
 
@@ -116,10 +116,10 @@ class MainController extends Controller
         }
 
 
-        return view('accounting\sales\sales', ['sales' => $sales]);
+        return view('accounting/sales/sales', ['sales' => $sales]);
     }
     public function addSales(){
-        return view('accounting\sales\addsales');
+        return view('accounting/sales/addsales');
     }
     public function saveSales(Request $request){
 
@@ -156,7 +156,7 @@ class MainController extends Controller
         }
 
         $sales = tblsales::where('SalesID','=',$request->salesID)->first();
-        return view('accounting\sales\salesEditForm', ['sales'=> $sales]);
+        return view('accounting/sales/salesEditForm', ['sales'=> $sales]);
 
     }
     public function delSales(Request $request){
@@ -176,10 +176,10 @@ class MainController extends Controller
         }
 
 
-        return view('accounting\payment_type\paymenttype', ['paymenttype' => $paymentType]);
+        return view('accounting/payment_type/paymenttype', ['paymenttype' => $paymentType]);
     }
     public function addPaymentType(){
-        return view('accounting\payment_type\addpaymenttype');
+        return view('accounting/payment_type/addpaymenttype');
     }
     public function savePaymentType(Request $request){
 
@@ -212,7 +212,7 @@ class MainController extends Controller
         }
 
         $paymentType = tblpmnttype::where('PmntID','=',$request->paymentTypeID)->first();
-        return view('accounting\payment_type\paymenttypeEditForm', ['paymenttype'=> $paymentType]);
+        return view('accounting/payment_type/paymenttypeEditForm', ['paymenttype'=> $paymentType]);
 
     }
     public function delPaymentType(Request $request){
@@ -232,10 +232,10 @@ class MainController extends Controller
         }
 
 
-        return view('accounting\status\status', ['status' => $status]);
+        return view('accounting/status/status', ['status' => $status]);
     }
     public function addStatus(){
-        return view('accounting\status\addstatus');
+        return view('accounting/status/addstatus');
     }
     public function saveStatus(Request $request){
 
@@ -272,7 +272,7 @@ class MainController extends Controller
         }
 
         $status = tblStatus::where('StatusID','=',$request->statusID)->first();
-        return view('accounting\status\statusEditForm', ['status'=> $status]);
+        return view('accounting/status/statusEditForm', ['status'=> $status]);
 
     }
     public function delStatus(Request $request){
@@ -348,7 +348,7 @@ class MainController extends Controller
 
 
 //        echo 'hello';
-        return view('accounting\creditors\creditor', ['creditor' => $creditor]);
+        return view('accounting/creditors/creditor', ['creditor' => $creditor]);
     }
     public function addCreditor(){
         $result = rolerightsfield::where('RoleID','=',Auth::user()->is_permission)
@@ -368,7 +368,7 @@ class MainController extends Controller
             $ContactID = 1;
         else
             $ContactID=$ContactID+1;
-        return view('accounting\creditors\addcreditor', ['sm' => $sm,'ContactID'=>$ContactID]);
+        return view('accounting/creditors/addcreditor', ['sm' => $sm,'ContactID'=>$ContactID]);
     }
     public function saveCreditor(Request $request){
 
@@ -566,17 +566,17 @@ class MainController extends Controller
             $contact = new tblcontacts();
         }
         $NumbOfDebt = tblDebtor::where('creditorID','=',$request->creditorID)->get()->Count('DebtorID');
-        $TotalPlaced=\DB::select('SELECT tblDebtors.CreditorID, round(Sum(tblDebtors.AmountPlaced),2) AS SumOfAmountPlaced FROM tblDebtors GROUP BY tblDebtors.CreditorID HAVING (((tblDebtors.CreditorID)=\''.$request->creditorID.'\'))');
-        $TotalCollected=\DB::select('SELECT tblDebtors.CreditorID,round( Sum(tblTrusts.PaymentReceived),2) AS Credits FROM tblDebtors INNER JOIN tblTrusts ON tblDebtors.DebtorID=tblTrusts.DebtorID WHERE (((tblTrusts.TPaymentType)="C")) GROUP BY tblDebtors.CreditorID HAVING (((tblDebtors.CreditorID)=\''.$request->creditorID.'\' ));');
-        $CollectTrust=\DB::select('SELECT DISTINCTROW tblDebtors.CreditorID,
+        $TotalPlaced=\DB::select('SELECT tbldebtors.CreditorID, round(Sum(tbldebtors.AmountPlaced),2) AS SumOfAmountPlaced FROM tbldebtors GROUP BY tbldebtors.CreditorID HAVING (((tbldebtors.CreditorID)=\''.$request->creditorID.'\'))');
+        $TotalCollected=\DB::select('SELECT tbldebtors.CreditorID,round( Sum(tbltrusts.PaymentReceived),2) AS Credits FROM tbldebtors INNER JOIN tbltrusts ON tbldebtors.DebtorID=tbltrusts.DebtorID WHERE (((tbltrusts.TPaymentType)="C")) GROUP BY tbldebtors.CreditorID HAVING (((tbldebtors.CreditorID)=\''.$request->creditorID.'\' ));');
+        $CollectTrust=\DB::select('SELECT DISTINCTROW tbldebtors.CreditorID,
      ROUND(Sum(COALESCE(Intrest,0)-
     COALESCE(AttyFees,0)+
     COALESCE(MiscFees,0)+
     COALESCE(AgencyGross,0)),2) AS SumOfNetClient
-    FROM tblDebtors LEFT JOIN tbltrusts tblTrust ON tblDebtors.DebtorID=tblTrust.DebtorID
-    WHERE (((tblTrust.TPaymentType)="T") And ((tblTrust.DateRcvd)>\'5/29/2000\') And ((tblDebtors.CreditorID)=\''.$request->creditorID.'\') )
-    GROUP BY tblDebtors.CreditorID;');
-        $CollectTrustOld=\DB::select('SELECT tblDebtors.CreditorID,  tblTrusts.DebtorID, round(Sum(COALESCE(tblTrusts.PaymentReceived,0)- COALESCE(MiscFees,0)+ COALESCE(CostRef,0)- COALESCE(AttyFees,0)- COALESCE(AgencyGross,0)),2) AS Pmnt FROM tblDebtors LEFT JOIN tblTrusts ON tblDebtors.DebtorID=tblTrusts.DebtorID WHERE (((tblTrusts.TPaymentType)="T") and tbltrusts.DateRcvd <= \'5/29/2000\' AND tbldebtors.CreditorID =\''.$request->creditorID.'\' ) GROUP BY tblDebtors.CreditorID, tblTrusts.DebtorID;');
+    FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID=tblTrust.DebtorID
+    WHERE (((tblTrust.TPaymentType)="T") And ((tblTrust.DateRcvd)>\'5/29/2000\') And ((tbldebtors.CreditorID)=\''.$request->creditorID.'\') )
+    GROUP BY tbldebtors.CreditorID;');
+        $CollectTrustOld=\DB::select('SELECT tbldebtors.CreditorID,  tbltrusts.DebtorID, round(Sum(COALESCE(tbltrusts.PaymentReceived,0)- COALESCE(MiscFees,0)+ COALESCE(CostRef,0)- COALESCE(AttyFees,0)- COALESCE(AgencyGross,0)),2) AS Pmnt FROM tbldebtors LEFT JOIN tbltrusts ON tbldebtors.DebtorID=tbltrusts.DebtorID WHERE (((tbltrusts.TPaymentType)="T") and tbltrusts.DateRcvd <= \'5/29/2000\' AND tbldebtors.CreditorID =\''.$request->creditorID.'\' ) GROUP BY tbldebtors.CreditorID, tbltrusts.DebtorID;');
         //CollectCredits + CollectTrust + CollectTrustOld
         $totalCollectedValue=0;
         if($TotalCollected !=null){
@@ -594,7 +594,7 @@ class MainController extends Controller
         }
         //$totalCollectedValue=floatval($TotalCollected[0]->Credits) + floatval($CollectTrust[0]->SumOfNetClient) + floatval($CollectTrustOld[0]->Pmnt);
 
-        $InvDue=\DB::select('select tblDebtors.CreditorID,COALESCE((case Fee1Type when \'%\'  then (Fee1Balance/100)*Fee1 ELSE Fee1 end) +  (case Fee2Type when Null  then 0 when \'%\' THEN (Fee2Balance/100)*Fee2 ELSE Fee2 end) + (case Fee3Type when Null  then 0 when \'%\' THEN (Fee3Balance/100)*Fee3 ELSE Fee3 end) - COALESCE(AttyFees,0),0)\'inv\' from tblDebtors LEFT JOIN tblInvoices ON tblDebtors.DebtorID=tblInvoices.DebtorID  GROUP BY tblDebtors.CreditorID HAVING (((tblDebtors.CreditorID)=\'ADI-112\' ));');
+        $InvDue=\DB::select('select tbldebtors.CreditorID,COALESCE((case Fee1Type when \'%\'  then (Fee1Balance/100)*Fee1 ELSE Fee1 end) +  (case Fee2Type when Null  then 0 when \'%\' THEN (Fee2Balance/100)*Fee2 ELSE Fee2 end) + (case Fee3Type when Null  then 0 when \'%\' THEN (Fee3Balance/100)*Fee3 ELSE Fee3 end) - COALESCE(AttyFees,0),0)\'inv\' from tbldebtors LEFT JOIN tblinvoices ON tbldebtors.DebtorID=tblinvoices.DebtorID  GROUP BY tbldebtors.CreditorID HAVING (((tbldebtors.CreditorID)=\'ADI-112\' ));');
         $InvDues=0;
         if($InvDue != null){
             $InvDues=$InvDue[0]->inv;
@@ -606,15 +606,15 @@ class MainController extends Controller
             $SumOfAmountPlaced =$TotalPlaced[0]->SumOfAmountPlaced;
         }
 
-        $ID=\DB::table('tblCreditors')->where('CreditorID', '=', $request->creditorID)->value('ID');
+        $ID=\DB::table('tblcreditors')->where('CreditorID', '=', $request->creditorID)->value('ID');
         $first =null;
         $last =null;
         $pID = tblCreditor::where('ID', '<', $ID)->max('ID');
-        $previous=\DB::table('tblCreditors')->where('ID', '=', $pID)->value('creditorID');
+        $previous=\DB::table('tblcreditors')->where('ID', '=', $pID)->value('creditorID');
     // get next user id
         $NID = tblCreditor::where('ID', '>', $ID)->min('ID');
-        $Next=\DB::table('tblCreditors')->where('ID', '=', $NID)->value('creditorID');
-        return view('accounting\creditors\creditorEditForm', ['creditor'=> $creditor,
+        $Next=\DB::table('tblcreditors')->where('ID', '=', $NID)->value('creditorID');
+        return view('accounting/creditors/creditorEditForm', ['creditor'=> $creditor,
             'sm'=>$sm,'NumbOfDebt'=>$NumbOfDebt,'SumOfAmountPlaced'=>$SumOfAmountPlaced,
             'totalCollectedValue'=>$totalCollectedValue,
             'CollectTrust'=>$CollectTrust,'InvDues'=>$InvDues,
@@ -673,10 +673,10 @@ class MainController extends Controller
 //        }
         
 
-        return view('accounting\contacts\contact', ['contacts' => $contacts]);
+        return view('accounting/contacts/contact', ['contacts' => $contacts]);
     }
     public function addContact(){
-        return view('accounting\contacts\addcontact');
+        return view('accounting/contacts/addcontact');
     }
     public function savecontact(Request $request){
 
@@ -769,7 +769,7 @@ class MainController extends Controller
             return redirect('/Contact?msg=Contact Successfully Updated.');
         }
         $contact = tblcontacts::where('creditorID','=', session('creditorID'))->where('ContactID','=',$request->contactID)->first();
-        return view('accounting\contacts\contactEditForm', ['contact'=> $contact]);
+        return view('accounting/contacts/contactEditForm', ['contact'=> $contact]);
 
     }
     public function delcontact(Request $request){
@@ -783,7 +783,7 @@ class MainController extends Controller
         $debtor = null;
         if($request->Export != null){
             //$creditor = tblcreditor::get();
-            $creditor= \DB::select('select * from tblDebtors');
+            $creditor= \DB::select('select * from tbldebtors');
             return  $this->Export($creditor,'Debtors');
         }
         if($request->searchCreditor == null) {
@@ -806,7 +806,7 @@ class MainController extends Controller
                 ->paginate(5)->appends(['searchCreditor' => $request->searchCreditor]);
         }
 
-        return view('accounting\debtors\debtor', ['debtor' => $debtor]);
+        return view('accounting/debtors/debtor', ['debtor' => $debtor]);
     }
     public function addDebtor(Request $request){
         $result = rolerightsfield::where('RoleID','=',Auth::user()->is_permission)
@@ -833,7 +833,7 @@ class MainController extends Controller
             $DebtorID = 1;
         else
             $DebtorID=$DebtorID+1;
-        return view('accounting\debtors\adddebtor', ['sm' => $sm,'cd' => $cd,'col' => $col,'DebtorID'=>$DebtorID ,'DID'=>$DID]);
+        return view('accounting/debtors/adddebtor', ['sm' => $sm,'cd' => $cd,'col' => $col,'DebtorID'=>$DebtorID ,'DID'=>$DID]);
     }
     public function getContact(Request $request){
         $id = $request->id;
@@ -1078,7 +1078,7 @@ class MainController extends Controller
         if($request->t){
             $tabIndex =  $request->t;
         }
-        return view('accounting\debtors\debtorEditForm', ['creditor'=> $creditor,'sm' => $sm,'cd' => $cd,'col' => $col,
+$tmp = array('creditor'=> $creditor,'sm' => $sm,'cd' => $cd,'col' => $col,
             'first'=>$first,
             'previous'=>$previous,
             'Next'=>$Next,
@@ -1093,29 +1093,32 @@ class MainController extends Controller
             'activityCode'=>$activityCode,
             'contact'=>$contact,
             'tabIndex'=>$tabIndex, // $request->tabIndex
-            'temp'=>$temp]);
+            'temp'=>$temp);
+
+
+        return view('accounting/debtors/debtorEditForm',$tmp);
 
     }
     public function calculationDebit(Request $request){
         $PaidInv=\DB::select('select ROUND(Sum(PaymentReceived),2) AS SumOfAmountPaid from tbltrusts where TPaymentType="C" AND DebtorID ='.$request->DebtorID.' GROUP BY DebtorID;');
-        /*$PaidInv=\DB::select('SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, ROUND(Sum(tblTrust.PaymentReceived),2) AS SumOfAmountPaid
-                    FROM tblDebtors LEFT JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
+        /*$PaidInv=\DB::select('SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, ROUND(Sum(tblTrust.PaymentReceived),2) AS SumOfAmountPaid
+                    FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
                     WHERE (((tblTrust.TPaymentType)="C") AND tblTrust.DebtorID ='.$request->DebtorID.')
-                    GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
+                    GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID;
                     ');*/
 
         $PaidTrustNew=\DB::select('select ROUND(Sum(CostRef),2) AS CostRef, ROUND(Sum(PaymentReceived+COALESCE(AttyFees,0)),2) AS SumOfNetClient from tbltrusts where TPaymentType="T" AND dateRcvd >\'5/29/2000\' AND DebtorID ='.$request->DebtorID.' GROUP BY DebtorID;');
-        /*  $PaidTrustNew=\DB::select('SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef,
+        /*  $PaidTrustNew=\DB::select('SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef,
 ROUND(Sum(tblTrust.PaymentReceived+COALESCE(AttyFees,0)),2) AS SumOfNetClient
-FROM tblDebtors LEFT JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
+FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
 WHERE (((tblTrust.TPaymentType)="T") AND ((tblTrust.DateRcvd)>\'5/29/2000\') AND tblTrust.DebtorID = '.$request->DebtorID.')
-GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
+GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID;
 ');**/
         $pending =0;
         if($PaidInv !=null){ $pending =$pending+$PaidInv[0]->SumOfAmountPaid; }
         if($PaidTrustNew !=null){$pending =$pending+$PaidTrustNew[0]->SumOfNetClient;}
         $AGross=\DB::select('select ROUND(Sum(AgencyGross),2) AS SumOfAgencyGross from tbltrusts where TPaymentType="T"  AND DebtorID ='.$request->DebtorID.'  GROUP BY DebtorID;');
-       // $AGross=\DB::select('SELECT tblDebtors.DebtorID, ROUND(Sum(tblTrust.AgencyGross),2) AS SumOfAgencyGross FROM tblDebtors INNER JOIN tbltrusts tblTrust ON tblDebtors.DebtorID=tblTrust.DebtorID WHERE (((tblTrust.TPaymentType)="T")) GROUP BY tblDebtors.DebtorID HAVING (((tblDebtors.DebtorID)='.$request->DebtorID.'))');
+       // $AGross=\DB::select('SELECT tbldebtors.DebtorID, ROUND(Sum(tblTrust.AgencyGross),2) AS SumOfAgencyGross FROM tbldebtors INNER JOIN tbltrusts tblTrust ON tbldebtors.DebtorID=tblTrust.DebtorID WHERE (((tblTrust.TPaymentType)="T")) GROUP BY tbldebtors.DebtorID HAVING (((tbldebtors.DebtorID)='.$request->DebtorID.'))');
 
         $FeesInv=\DB::select('SELECT
         ROUND(Sum(
@@ -1125,15 +1128,15 @@ GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
         ) ,2)AS DueInv
         FROM  tblinvoices  WHERE  DebtorID ='.$request->DebtorID.'
         GROUP BY DebtorID;');
-       /* $FeesInv=\DB::select('SELECT tblDebtors.DebtorID,
+       /* $FeesInv=\DB::select('SELECT tbldebtors.DebtorID,
     ROUND(Sum(
     case Fee1Type when "%" then (Fee1Balance/100)*Fee1 else Fee1 end +
     case Fee2Type when null then 0 when Fee2Type="%" then (Fee2Balance/100)*Fee2 when "$" then Fee2 end +
     case Fee3Type when null then 0 when Fee3Type=\'%\' then (Fee3Balance/100)*Fee3 when "$" then Fee3 end
     ) ,2)AS DueInv
-    FROM tblDebtors INNER JOIN tblinvoices tblInvoice ON tblDebtors.DebtorID=tblInvoice.DebtorID
-    GROUP BY tblDebtors.DebtorID
-    HAVING (((tblDebtors.DebtorID)='.$request->DebtorID.'));');*/
+    FROM tbldebtors INNER JOIN tblinvoices tblInvoice ON tbldebtors.DebtorID=tblInvoice.DebtorID
+    GROUP BY tbldebtors.DebtorID
+    HAVING (((tbldebtors.DebtorID)='.$request->DebtorID.'));');*/
         $FeesVal=0;
         if($AGross !=null){
             $FeesVal=$FeesVal+$AGross[0]->SumOfAgencyGross;
@@ -1145,11 +1148,11 @@ GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
     FROM  tbltrusts
     WHERE TPaymentType="T" AND DebtorID ='.$request->DebtorID.'
     GROUP BY DebtorID;');
-      /*  $MISCFeeTrust=\DB::select('SELECT tblDebtors.DebtorID,round( Sum(tblTrust.MiscFees),2) AS SumOfMiscFees
-    FROM tblDebtors INNER JOIN tbltrusts tblTrust ON tblDebtors.DebtorID=tblTrust.DebtorID
+      /*  $MISCFeeTrust=\DB::select('SELECT tbldebtors.DebtorID,round( Sum(tblTrust.MiscFees),2) AS SumOfMiscFees
+    FROM tbldebtors INNER JOIN tbltrusts tblTrust ON tbldebtors.DebtorID=tblTrust.DebtorID
     WHERE (((tblTrust.TPaymentType)="T"))
-    GROUP BY tblDebtors.DebtorID
-    HAVING (((tblDebtors.DebtorID)='.$request->DebtorID.'));');*/
+    GROUP BY tbldebtors.DebtorID
+    HAVING (((tbldebtors.DebtorID)='.$request->DebtorID.'));');*/
         $MISCFeeTrustVal=0;
         if($MISCFeeTrust != null){
             $MISCFeeTrustVal=$MISCFeeTrust[0]->SumOfMiscFees;
@@ -1158,11 +1161,11 @@ GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
     FROM  tbltrusts
     WHERE TPaymentType="T" AND DebtorID ='.$request->DebtorID.'
     GROUP BY DebtorID;');
-      /*  $CostRecovered=\DB::select('SELECT tblDebtors.DebtorID, round(Sum(tblTrust.CostRef),2) AS SumOfCostRef
-    FROM tblDebtors INNER JOIN tbltrusts tblTrust ON tblDebtors.DebtorID=tblTrust.DebtorID
+      /*  $CostRecovered=\DB::select('SELECT tbldebtors.DebtorID, round(Sum(tblTrust.CostRef),2) AS SumOfCostRef
+    FROM tbldebtors INNER JOIN tbltrusts tblTrust ON tbldebtors.DebtorID=tblTrust.DebtorID
     WHERE (((tblTrust.TPaymentType)="T"))
-    GROUP BY tblDebtors.DebtorID
-    HAVING (((tblDebtors.DebtorID)='.$request->DebtorID.'));');*/
+    GROUP BY tbldebtors.DebtorID
+    HAVING (((tbldebtors.DebtorID)='.$request->DebtorID.'));');*/
         $CostRecoveredVal=0;
         if($CostRecovered != null){
             $CostRecoveredVal=$CostRecovered[0]->SumOfCostRef;
@@ -1208,37 +1211,37 @@ GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
         where('DebtorID','=',$request->DebtorID)
             ->get();
 
-        return view('accounting\debtors\Letters',['temp'=>$temp,'selected'=>$selected]);
+        return view('accounting/debtors/Letters',['temp'=>$temp,'selected'=>$selected]);
     }
     public function ShowlettersDebtor(Request $request){
         if($request->LetterType == 2){
-            $data=\DB::select('SELECT tblDebtors.DebtorID, tblDebtors.DebtorName, tblContacts.ContactID, tblDebtors.ClientAcntNumber,
-tblContacts.ClientName, tblContacts.Saltnt, tblContacts.CFirstName, tblContacts.CLastName,
-CONCAT(Trim(tblSales.SFirstName),"  ", Trim(tblSales.SLastName)) AS Salesman, tblContacts.Street,
-CONCAT(Trim(tblContacts.City) ,", " , tblContacts.State , "  " , Trim(tblContacts.Zip)) AS Address2,
-tblContacts.ClientName, tblDebtors.AmountPlaced, tblContacts.MainManager
-FROM (((tblCreditors tblCreditor LEFT JOIN tblSales ON tblCreditor.SaleID = tblSales.SalesID)
-LEFT JOIN tblContacts ON tblCreditor.CreditorID = tblContacts.CreditorID)
-LEFT JOIN tblDebtors ON tblCreditor.CreditorID = tblDebtors.CreditorID)
-LEFT JOIN tblTrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
-GROUP BY tblDebtors.DebtorID, tblDebtors.DebtorName, tblContacts.ContactID,
-tblDebtors.ClientAcntNumber, tblContacts.Saltnt, tblContacts.CFirstName,
-tblContacts.CLastName, Trim(tblSales.SFirstName) & " " & Trim(tblSales.SLastName),
-tblContacts.Street, Trim(tblContacts.City) & ", " & tblContacts.State & "  " & Trim(tblContacts.Zip),
-tblContacts.ClientName, tblDebtors.AmountPlaced, tblContacts.MainManager, tblContacts.ClientName
-HAVING (((tblDebtors.DebtorID)='.$request->DebtorID.') AND ((tblContacts.ContactID)=(select ContactID from tblcontacts WHERE MainManager=1 AND CreditorID=(SELECT CreditorID FROM tbldebtors WHERE DebtorID='.$request->DebtorID.'))));');
+            $data=\DB::select('SELECT tbldebtors.DebtorID, tbldebtors.DebtorName, tblcontacts.ContactID, tbldebtors.ClientAcntNumber,
+tblcontacts.ClientName, tblcontacts.Saltnt, tblcontacts.CFirstName, tblcontacts.CLastName,
+CONCAT(Trim(tblSales.SFirstName),"  ", Trim(tblSales.SLastName)) AS Salesman, tblcontacts.Street,
+CONCAT(Trim(tblcontacts.City) ,", " , tblcontacts.State , "  " , Trim(tblcontacts.Zip)) AS Address2,
+tblcontacts.ClientName, tbldebtors.AmountPlaced, tblcontacts.MainManager
+FROM (((tblcreditors tblCreditor LEFT JOIN tblSales ON tblCreditor.SaleID = tblSales.SalesID)
+LEFT JOIN tblcontacts ON tblCreditor.CreditorID = tblcontacts.CreditorID)
+LEFT JOIN tbldebtors ON tblCreditor.CreditorID = tbldebtors.CreditorID)
+LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
+GROUP BY tbldebtors.DebtorID, tbldebtors.DebtorName, tblcontacts.ContactID,
+tbldebtors.ClientAcntNumber, tblcontacts.Saltnt, tblcontacts.CFirstName,
+tblcontacts.CLastName, Trim(tblSales.SFirstName) & " " & Trim(tblSales.SLastName),
+tblcontacts.Street, Trim(tblcontacts.City) & ", " & tblcontacts.State & "  " & Trim(tblcontacts.Zip),
+tblcontacts.ClientName, tbldebtors.AmountPlaced, tblcontacts.MainManager, tblcontacts.ClientName
+HAVING (((tbldebtors.DebtorID)='.$request->DebtorID.') AND ((tblcontacts.ContactID)=(select ContactID from tblcontacts WHERE MainManager=1 AND CreditorID=(SELECT CreditorID FROM tbldebtors WHERE DebtorID='.$request->DebtorID.'))));');
             $result=null;
             if($data !=null){$result=$data[0];}
-            $CollectTrustOld=\DB::select('SELECT tblDebtors.CreditorID,  tblTrusts.DebtorID,  Sum(COALESCE(tblTrusts.PaymentReceived,0)- COALESCE(MiscFees,0)+ COALESCE(CostRef,0)- COALESCE(AttyFees,0)- COALESCE(AgencyGross,0)) AS Pmnt FROM tblDebtors LEFT JOIN tblTrusts ON tblDebtors.DebtorID=tblTrusts.DebtorID WHERE (((tblTrusts.TPaymentType)="T") and tbltrusts.DateRcvd <= \'5/29/2000\' AND tbldebtors.CreditorID =\''.$request->creditorID.'\' ) GROUP BY tblDebtors.CreditorID, tblTrusts.DebtorID;');
-            $PaidInv=\DB::select('SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.PaymentReceived) AS SumOfAmountPaid
-                    FROM tblDebtors LEFT JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
+            $CollectTrustOld=\DB::select('SELECT tbldebtors.CreditorID,  tbltrusts.DebtorID,  Sum(COALESCE(tbltrusts.PaymentReceived,0)- COALESCE(MiscFees,0)+ COALESCE(CostRef,0)- COALESCE(AttyFees,0)- COALESCE(AgencyGross,0)) AS Pmnt FROM tbldebtors LEFT JOIN tbltrusts ON tbldebtors.DebtorID=tbltrusts.DebtorID WHERE (((tbltrusts.TPaymentType)="T") and tbltrusts.DateRcvd <= \'5/29/2000\' AND tbldebtors.CreditorID =\''.$request->creditorID.'\' ) GROUP BY tbldebtors.CreditorID, tbltrusts.DebtorID;');
+            $PaidInv=\DB::select('SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.PaymentReceived) AS SumOfAmountPaid
+                    FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
                     WHERE (((tblTrust.TPaymentType)="C") AND tblTrust.DebtorID ='.$request->DebtorID.')
-                    GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
+                    GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID;
                     ');
-            $PaidTrustNew=\DB::select('SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(tblTrust.PaymentReceived+COALESCE(AttyFees,0)) AS SumOfNetClient
-FROM tblDebtors LEFT JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
+            $PaidTrustNew=\DB::select('SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(tblTrust.PaymentReceived+COALESCE(AttyFees,0)) AS SumOfNetClient
+FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
 WHERE (((tblTrust.TPaymentType)="T") AND ((tblTrust.DateRcvd)>\'5/29/2000\') AND tblTrust.DebtorID = 5)
-GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
+GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID;
 ');
             $val=0;
             if($PaidInv!=null){
@@ -1289,33 +1292,33 @@ Thank you for this item of collection business.');
                 $objWriter->save(storage_path('C1.docx'));
 
                 return response()->download(storage_path('C1.docx'));}
-                //return view('accounting\debtors\C1',['result'=>$result,'val'=>$val]);
+                //return view('accounting/debtors/C1',['result'=>$result,'val'=>$val]);
             }
         }
 
         if($request->LetterType == 5 || $request->LetterType == 6 || $request->LetterType == 7 || $request->LetterType == 8 || $request->LetterType == 9 || $request->LetterType == 3 || $request->LetterType == 4){
-            $result=\DB::select('SELECT tblDebtors.DebtorID, tblDebtors.DebtorName,
-Format(tblDebtors.FormDate,"mmm dd"", ""yyyy") AS FormDate,
-CONCAT(Trim(tblCollectors.CFirstName) , " " , Trim(tblCollectors.CLastName)) AS Collector,
-CONCAT("Attn: " , tblDebtors.Salutation , " " , tblDebtors.DFirstName , " " , Trim(tblDebtors.DLastName)) AS DAttn,
-tblDebtors.Street, CONCAT(Trim(tblDebtors.City) , ", " , tblDebtors.State , "  " , Trim(tblDebtors.Zip)) AS Address2,
-tblContacts.ClientName, tblDebtors.AmountPlaced, tblContacts.MainManager, tblContacts.Street AS CreditorStreet,
-tblContacts.City AS CreditorCity, tblContacts.State AS CreditorState, tblContacts.Zip AS CreditorZip,
-tblDebtors.Phone AS DebtorPhone, tblDebtors.ClientAcntNumber, qryGetContactID.CFullName
-FROM (((tblCreditors tblCreditor
-INNER JOIN (select tblContacts.ContactID,CONCAT(CFirstName , " ", CLastName) AS CFullName, tblContacts.CreditorID from tblcontacts WHERE MainManager=1 AND CreditorID=(SELECT CreditorID FROM tbldebtors WHERE DebtorID='.$request->DebtorID.'))qryGetContactID ON tblCreditor.CreditorID = qryGetContactID.CreditorID)
-LEFT JOIN tblContacts ON tblCreditor.CreditorID = tblContacts.CreditorID)
-LEFT JOIN (tblCollectors
-RIGHT JOIN tblDebtors ON tblCollectors.ColID = tblDebtors.ColID) ON tblCreditor.CreditorID = tblDebtors.CreditorID)
-LEFT JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
-GROUP BY tblDebtors.DebtorID, tblDebtors.DebtorName, Format(tblDebtors.FormDate,"mmm dd"", ""yyyy"),
-Trim(tblCollectors.CFirstName) & " " & Trim(tblCollectors.CLastName),
-"Attn: " & tblDebtors.Salutation & " " & tblDebtors.DFirstName & " " & Trim(tblDebtors.DLastName),
-tblDebtors.Street, Trim(tblDebtors.City) & ", " & tblDebtors.State & "  " & Trim(tblDebtors.Zip),
-tblContacts.ClientName, tblDebtors.AmountPlaced, tblContacts.MainManager, tblContacts.Street,
-tblContacts.City, tblContacts.State, tblContacts.Zip, tblDebtors.Phone, tblDebtors.ClientAcntNumber,
+            $result=\DB::select('SELECT tbldebtors.DebtorID, tbldebtors.DebtorName,
+Format(tbldebtors.FormDate,"mmm dd"", ""yyyy") AS FormDate,
+CONCAT(Trim(tblcollectors.CFirstName) , " " , Trim(tblcollectors.CLastName)) AS Collector,
+CONCAT("Attn: " , tbldebtors.Salutation , " " , tbldebtors.DFirstName , " " , Trim(tbldebtors.DLastName)) AS DAttn,
+tbldebtors.Street, CONCAT(Trim(tbldebtors.City) , ", " , tbldebtors.State , "  " , Trim(tbldebtors.Zip)) AS Address2,
+tblcontacts.ClientName, tbldebtors.AmountPlaced, tblcontacts.MainManager, tblcontacts.Street AS CreditorStreet,
+tblcontacts.City AS CreditorCity, tblcontacts.State AS CreditorState, tblcontacts.Zip AS CreditorZip,
+tbldebtors.Phone AS DebtorPhone, tbldebtors.ClientAcntNumber, qryGetContactID.CFullName
+FROM (((tblcreditors tblCreditor
+INNER JOIN (select tblcontacts.ContactID,CONCAT(CFirstName , " ", CLastName) AS CFullName, tblcontacts.CreditorID from tblcontacts WHERE MainManager=1 AND CreditorID=(SELECT CreditorID FROM tbldebtors WHERE DebtorID='.$request->DebtorID.'))qryGetContactID ON tblCreditor.CreditorID = qryGetContactID.CreditorID)
+LEFT JOIN tblcontacts ON tblCreditor.CreditorID = tblcontacts.CreditorID)
+LEFT JOIN (tblcollectors
+RIGHT JOIN tbldebtors ON tblcollectors.ColID = tbldebtors.ColID) ON tblCreditor.CreditorID = tbldebtors.CreditorID)
+LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
+GROUP BY tbldebtors.DebtorID, tbldebtors.DebtorName, Format(tbldebtors.FormDate,"mmm dd"", ""yyyy"),
+Trim(tblcollectors.CFirstName) & " " & Trim(tblcollectors.CLastName),
+"Attn: " & tbldebtors.Salutation & " " & tbldebtors.DFirstName & " " & Trim(tbldebtors.DLastName),
+tbldebtors.Street, Trim(tbldebtors.City) & ", " & tbldebtors.State & "  " & Trim(tbldebtors.Zip),
+tblcontacts.ClientName, tbldebtors.AmountPlaced, tblcontacts.MainManager, tblcontacts.Street,
+tblcontacts.City, tblcontacts.State, tblcontacts.Zip, tbldebtors.Phone, tbldebtors.ClientAcntNumber,
 qryGetContactID.CFullName
-HAVING (((tblDebtors.DebtorID)='.$request->DebtorID.') AND ((tblContacts.MainManager)=True));
+HAVING (((tbldebtors.DebtorID)='.$request->DebtorID.') AND ((tblcontacts.MainManager)=True));
 ');
             if($request->LetterType == 5){
                 $views='accounting\debtors\D1';
@@ -1356,12 +1359,12 @@ Make your check payable to: ' . $result->ClientName . ', however mail it to this
 
                     return response()->download(storage_path('D1.docx'));
                 }
-                    //return view('accounting\debtors\C1',['result'=>$result,'val'=>$val]);
+                    //return view('accounting/debtors/C1',['result'=>$result,'val'=>$val]);
                 }
-                //return view('accounting\debtors\D1',['result'=>$result[0]]);
+                //return view('accounting/debtors/D1',['result'=>$result[0]]);
             }
             if($request->LetterType == 6){
-                //return view('accounting\debtors\D2',['result'=>$result[0]]);
+                //return view('accounting/debtors/D2',['result'=>$result[0]]);
                 $views='accounting\debtors\D2';
                 $data=['result'=>$result[0]];
                 if($request->view == 'Export') {
@@ -1399,20 +1402,20 @@ We will advance our files 7 days from the date of this letter with expectations 
 
                     return response()->download(storage_path('D2.docx'));
                 }
-                    //return view('accounting\debtors\C1',['result'=>$result,'val'=>$val]);
+                    //return view('accounting/debtors/C1',['result'=>$result,'val'=>$val]);
                 }
             }
             if($request->LetterType == 7){
-                $CollectTrustOld=\DB::select('SELECT tblDebtors.CreditorID,  tblTrusts.DebtorID,  Sum(COALESCE(tblTrusts.PaymentReceived,0)- COALESCE(MiscFees,0)+ COALESCE(CostRef,0)- COALESCE(AttyFees,0)- COALESCE(AgencyGross,0)) AS Pmnt FROM tblDebtors LEFT JOIN tblTrusts ON tblDebtors.DebtorID=tblTrusts.DebtorID WHERE (((tblTrusts.TPaymentType)="T") and tbltrusts.DateRcvd <= \'5/29/2000\' AND tbldebtors.CreditorID =\''.$request->creditorID.'\' ) GROUP BY tblDebtors.CreditorID, tblTrusts.DebtorID;');
-                $PaidInv=\DB::select('SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.PaymentReceived) AS SumOfAmountPaid
-                    FROM tblDebtors LEFT JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
+                $CollectTrustOld=\DB::select('SELECT tbldebtors.CreditorID,  tbltrusts.DebtorID,  Sum(COALESCE(tbltrusts.PaymentReceived,0)- COALESCE(MiscFees,0)+ COALESCE(CostRef,0)- COALESCE(AttyFees,0)- COALESCE(AgencyGross,0)) AS Pmnt FROM tbldebtors LEFT JOIN tbltrusts ON tbldebtors.DebtorID=tbltrusts.DebtorID WHERE (((tbltrusts.TPaymentType)="T") and tbltrusts.DateRcvd <= \'5/29/2000\' AND tbldebtors.CreditorID =\''.$request->creditorID.'\' ) GROUP BY tbldebtors.CreditorID, tbltrusts.DebtorID;');
+                $PaidInv=\DB::select('SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.PaymentReceived) AS SumOfAmountPaid
+                    FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
                     WHERE (((tblTrust.TPaymentType)="C") AND tblTrust.DebtorID ='.$request->DebtorID.')
-                    GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
+                    GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID;
                     ');
-                $PaidTrustNew=\DB::select('SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(tblTrust.PaymentReceived+COALESCE(AttyFees,0)) AS SumOfNetClient
-FROM tblDebtors LEFT JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
+                $PaidTrustNew=\DB::select('SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(tblTrust.PaymentReceived+COALESCE(AttyFees,0)) AS SumOfNetClient
+FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
 WHERE (((tblTrust.TPaymentType)="T") AND ((tblTrust.DateRcvd)>\'5/29/2000\') AND tblTrust.DebtorID = '.$request->DebtorID.')
-GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
+GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID;
 ');
                 $val=0;
                 if($PaidInv!=null){
@@ -1426,7 +1429,7 @@ GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
                 if($CollectTrustOld !=null){
                     $val=$val+$CollectTrustOld[0]->Pmnt;
                 }
-                //return view('accounting\debtors\D8',['result'=>$result[0],'val'=>$val]);
+                //return view('accounting/debtors/D8',['result'=>$result[0],'val'=>$val]);
                 $views='accounting\debtors\D8';
                 $data=['result'=>$result[0],'val'=>$val];
                 if($request->view == 'Export') {
@@ -1464,20 +1467,20 @@ Accordingly, if we do not hear from you within 7 days from the date of this lett
 
                     return response()->download(storage_path('D8.docx'));
                 }
-                    //return view('accounting\debtors\C1',['result'=>$result,'val'=>$val]);
+                    //return view('accounting/debtors/C1',['result'=>$result,'val'=>$val]);
                 }
             }
             if($request->LetterType == 8){
-                $CollectTrustOld=\DB::select('SELECT tblDebtors.CreditorID,  tblTrusts.DebtorID,  Sum(COALESCE(tblTrusts.PaymentReceived,0)- COALESCE(MiscFees,0)+ COALESCE(CostRef,0)- COALESCE(AttyFees,0)- COALESCE(AgencyGross,0)) AS Pmnt FROM tblDebtors LEFT JOIN tblTrusts ON tblDebtors.DebtorID=tblTrusts.DebtorID WHERE (((tblTrusts.TPaymentType)="T") and tbltrusts.DateRcvd <= \'5/29/2000\' AND tbldebtors.CreditorID =\''.$request->creditorID.'\' ) GROUP BY tblDebtors.CreditorID, tblTrusts.DebtorID;');
-                $PaidInv=\DB::select('SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.PaymentReceived) AS SumOfAmountPaid
-                    FROM tblDebtors LEFT JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
+                $CollectTrustOld=\DB::select('SELECT tbldebtors.CreditorID,  tbltrusts.DebtorID,  Sum(COALESCE(tbltrusts.PaymentReceived,0)- COALESCE(MiscFees,0)+ COALESCE(CostRef,0)- COALESCE(AttyFees,0)- COALESCE(AgencyGross,0)) AS Pmnt FROM tbldebtors LEFT JOIN tbltrusts ON tbldebtors.DebtorID=tbltrusts.DebtorID WHERE (((tbltrusts.TPaymentType)="T") and tbltrusts.DateRcvd <= \'5/29/2000\' AND tbldebtors.CreditorID =\''.$request->creditorID.'\' ) GROUP BY tbldebtors.CreditorID, tbltrusts.DebtorID;');
+                $PaidInv=\DB::select('SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.PaymentReceived) AS SumOfAmountPaid
+                    FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
                     WHERE (((tblTrust.TPaymentType)="C") AND tblTrust.DebtorID ='.$request->DebtorID.')
-                    GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
+                    GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID;
                     ');
-                $PaidTrustNew=\DB::select('SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(tblTrust.PaymentReceived+COALESCE(AttyFees,0)) AS SumOfNetClient
-FROM tblDebtors LEFT JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
+                $PaidTrustNew=\DB::select('SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(tblTrust.PaymentReceived+COALESCE(AttyFees,0)) AS SumOfNetClient
+FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
 WHERE (((tblTrust.TPaymentType)="T") AND ((tblTrust.DateRcvd)>\'5/29/2000\') AND tblTrust.DebtorID = '.$request->DebtorID.')
-GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
+GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID;
 ');
                 $val=0;
                 if($PaidInv!=null){
@@ -1491,7 +1494,7 @@ GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
                 if($CollectTrustOld !=null){
                     $val=$val+$CollectTrustOld[0]->Pmnt;
                 }
-                //return view('accounting\debtors\D15',['result'=>$result[0],'val'=>$val]);
+                //return view('accounting/debtors/D15',['result'=>$result[0],'val'=>$val]);
                 $views='accounting\debtors\D15';
                 $data=['result'=>$result[0],'val'=>$val];
                 if($request->view == 'Export') {
@@ -1528,20 +1531,20 @@ Make your check payable to: ' . $result->ClientName . ', however mail it to this
 
                     return response()->download(storage_path('D15.docx'));
                 }
-                    //return view('accounting\debtors\C1',['result'=>$result,'val'=>$val]);
+                    //return view('accounting/debtors/C1',['result'=>$result,'val'=>$val]);
                 }
             }
             if($request->LetterType == 9){
-                $CollectTrustOld=\DB::select('SELECT tblDebtors.CreditorID,  tblTrusts.DebtorID,  Sum(COALESCE(tblTrusts.PaymentReceived,0)- COALESCE(MiscFees,0)+ COALESCE(CostRef,0)- COALESCE(AttyFees,0)- COALESCE(AgencyGross,0)) AS Pmnt FROM tblDebtors LEFT JOIN tblTrusts ON tblDebtors.DebtorID=tblTrusts.DebtorID WHERE (((tblTrusts.TPaymentType)="T") and tbltrusts.DateRcvd <= \'5/29/2000\' AND tbldebtors.CreditorID =\''.$request->creditorID.'\' ) GROUP BY tblDebtors.CreditorID, tblTrusts.DebtorID;');
-                $PaidInv=\DB::select('SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.PaymentReceived) AS SumOfAmountPaid
-                    FROM tblDebtors LEFT JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
+                $CollectTrustOld=\DB::select('SELECT tbldebtors.CreditorID,  tbltrusts.DebtorID,  Sum(COALESCE(tbltrusts.PaymentReceived,0)- COALESCE(MiscFees,0)+ COALESCE(CostRef,0)- COALESCE(AttyFees,0)- COALESCE(AgencyGross,0)) AS Pmnt FROM tbldebtors LEFT JOIN tbltrusts ON tbldebtors.DebtorID=tbltrusts.DebtorID WHERE (((tbltrusts.TPaymentType)="T") and tbltrusts.DateRcvd <= \'5/29/2000\' AND tbldebtors.CreditorID =\''.$request->creditorID.'\' ) GROUP BY tbldebtors.CreditorID, tbltrusts.DebtorID;');
+                $PaidInv=\DB::select('SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.PaymentReceived) AS SumOfAmountPaid
+                    FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
                     WHERE (((tblTrust.TPaymentType)="C") AND tblTrust.DebtorID ='.$request->DebtorID.')
-                    GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
+                    GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID;
                     ');
-                $PaidTrustNew=\DB::select('SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(tblTrust.PaymentReceived+COALESCE(AttyFees,0)) AS SumOfNetClient
-FROM tblDebtors LEFT JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
+                $PaidTrustNew=\DB::select('SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(tblTrust.PaymentReceived+COALESCE(AttyFees,0)) AS SumOfNetClient
+FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
 WHERE (((tblTrust.TPaymentType)="T") AND ((tblTrust.DateRcvd)>\'5/29/2000\') AND tblTrust.DebtorID = '.$request->DebtorID.')
-GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
+GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID;
 ');
                 $val=0;
                 if($PaidInv!=null){
@@ -1555,7 +1558,7 @@ GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
                 if($CollectTrustOld !=null){
                     $val=$val+$CollectTrustOld[0]->Pmnt;
                 }
-                //return view('accounting\debtors\D20',['result'=>$result[0],'val'=>$val]);
+                //return view('accounting/debtors/D20',['result'=>$result[0],'val'=>$val]);
                 $views='accounting\debtors\D20';
                 $data=['result'=>$result[0],'val'=>$val];
                 if($request->view == 'Export') {
@@ -1599,16 +1602,16 @@ Send your payment or explanation today.');
             }
 
             if($request->LetterType == 3){
-                $CollectTrustOld=\DB::select('SELECT tblDebtors.CreditorID,  tblTrusts.DebtorID,  Sum(COALESCE(tblTrusts.PaymentReceived,0)- COALESCE(MiscFees,0)+ COALESCE(CostRef,0)- COALESCE(AttyFees,0)- COALESCE(AgencyGross,0)) AS Pmnt FROM tblDebtors LEFT JOIN tblTrusts ON tblDebtors.DebtorID=tblTrusts.DebtorID WHERE (((tblTrusts.TPaymentType)="T") and tbltrusts.DateRcvd <= \'5/29/2000\' AND tbldebtors.CreditorID =\''.$request->creditorID.'\' ) GROUP BY tblDebtors.CreditorID, tblTrusts.DebtorID;');
-                $PaidInv=\DB::select('SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.PaymentReceived) AS SumOfAmountPaid
-                    FROM tblDebtors LEFT JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
+                $CollectTrustOld=\DB::select('SELECT tbldebtors.CreditorID,  tbltrusts.DebtorID,  Sum(COALESCE(tbltrusts.PaymentReceived,0)- COALESCE(MiscFees,0)+ COALESCE(CostRef,0)- COALESCE(AttyFees,0)- COALESCE(AgencyGross,0)) AS Pmnt FROM tbldebtors LEFT JOIN tbltrusts ON tbldebtors.DebtorID=tbltrusts.DebtorID WHERE (((tbltrusts.TPaymentType)="T") and tbltrusts.DateRcvd <= \'5/29/2000\' AND tbldebtors.CreditorID =\''.$request->creditorID.'\' ) GROUP BY tbldebtors.CreditorID, tbltrusts.DebtorID;');
+                $PaidInv=\DB::select('SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.PaymentReceived) AS SumOfAmountPaid
+                    FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
                     WHERE (((tblTrust.TPaymentType)="C") AND tblTrust.DebtorID ='.$request->DebtorID.')
-                    GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
+                    GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID;
                     ');
-                $PaidTrustNew=\DB::select('SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(tblTrust.PaymentReceived+COALESCE(AttyFees,0)) AS SumOfNetClient
-FROM tblDebtors LEFT JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
+                $PaidTrustNew=\DB::select('SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(tblTrust.PaymentReceived+COALESCE(AttyFees,0)) AS SumOfNetClient
+FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
 WHERE (((tblTrust.TPaymentType)="T") AND ((tblTrust.DateRcvd)>\'5/29/2000\') AND tblTrust.DebtorID = '.$request->DebtorID.')
-GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
+GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID;
 ');
                 $val=0;
                 if($PaidInv!=null){
@@ -1673,16 +1676,16 @@ Your prompt attention to this notice will avoid further proceedings.');
                 }
             }
             if($request->LetterType == 4){
-                $CollectTrustOld=\DB::select('SELECT tblDebtors.CreditorID,  tblTrusts.DebtorID,  Sum(COALESCE(tblTrusts.PaymentReceived,0)- COALESCE(MiscFees,0)+ COALESCE(CostRef,0)- COALESCE(AttyFees,0)- COALESCE(AgencyGross,0)) AS Pmnt FROM tblDebtors LEFT JOIN tblTrusts ON tblDebtors.DebtorID=tblTrusts.DebtorID WHERE (((tblTrusts.TPaymentType)="T") and tbltrusts.DateRcvd <= \'5/29/2000\' AND tbldebtors.CreditorID =\''.$request->creditorID.'\' ) GROUP BY tblDebtors.CreditorID, tblTrusts.DebtorID;');
-                $PaidInv=\DB::select('SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.PaymentReceived) AS SumOfAmountPaid
-                    FROM tblDebtors LEFT JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
+                $CollectTrustOld=\DB::select('SELECT tbldebtors.CreditorID,  tbltrusts.DebtorID,  Sum(COALESCE(tbltrusts.PaymentReceived,0)- COALESCE(MiscFees,0)+ COALESCE(CostRef,0)- COALESCE(AttyFees,0)- COALESCE(AgencyGross,0)) AS Pmnt FROM tbldebtors LEFT JOIN tbltrusts ON tbldebtors.DebtorID=tbltrusts.DebtorID WHERE (((tbltrusts.TPaymentType)="T") and tbltrusts.DateRcvd <= \'5/29/2000\' AND tbldebtors.CreditorID =\''.$request->creditorID.'\' ) GROUP BY tbldebtors.CreditorID, tbltrusts.DebtorID;');
+                $PaidInv=\DB::select('SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.PaymentReceived) AS SumOfAmountPaid
+                    FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
                     WHERE (((tblTrust.TPaymentType)="C") AND tblTrust.DebtorID ='.$request->DebtorID.')
-                    GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
+                    GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID;
                     ');
-                $PaidTrustNew=\DB::select('SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(tblTrust.PaymentReceived+COALESCE(AttyFees,0)) AS SumOfNetClient
-FROM tblDebtors LEFT JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
+                $PaidTrustNew=\DB::select('SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(tblTrust.PaymentReceived+COALESCE(AttyFees,0)) AS SumOfNetClient
+FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
 WHERE (((tblTrust.TPaymentType)="T") AND ((tblTrust.DateRcvd)>\'5/29/2000\') AND tblTrust.DebtorID = '.$request->DebtorID.')
-GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
+GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID;
 ');
                 $val=0;
                 if($PaidInv!=null){
@@ -1890,7 +1893,7 @@ Your prompt attention to this notice will avoid further proceedings.');
             }
         }
         
-        return view('accounting\download\ChangePrefix', [
+        return view('accounting/download/ChangePrefix', [
             'preFix'=>$preFix,'files'=>$posts]);
         
     }
@@ -1919,7 +1922,7 @@ Your prompt attention to this notice will avoid further proceedings.');
         $selected = null;
         if($request->Export != null){
             //$creditor = tblcreditor::get();
-            $creditor= \DB::select('select * from tblTrusts where TPaymentType=\'T\'');
+            $creditor= \DB::select('select * from tbltrusts where TPaymentType=\'T\'');
             return  $this->Export($creditor,'TrustActivity');
         }
         if($request->DebtorID == null) {
@@ -1933,7 +1936,7 @@ Your prompt attention to this notice will avoid further proceedings.');
             where('DebtorID','=',$request->DebtorID)
                 ->get();
         }
-        return view('accounting\trust\trust', ['debtor' => $debtor,'selected'=>$selected]);
+        return view('accounting/trust/trust', ['debtor' => $debtor,'selected'=>$selected]);
     }
     public function addTrustActivity(Request $request){
         $result = rolerightsfield::where('RoleID','=',Auth::user()->is_permission)
@@ -1951,7 +1954,7 @@ Your prompt attention to this notice will avoid further proceedings.');
         $debtors  = tblDebtor::
         where('DebtorID','=',$request->DebtorID)
             ->get();
-        return view('accounting\trust\addTrustActivity', ['debtors' => $debtors,'col' => $col]);
+        return view('accounting/trust/addTrustActivity', ['debtors' => $debtors,'col' => $col]);
     }
     public function saveTrustActivity(Request $request){
 
@@ -2053,7 +2056,7 @@ Your prompt attention to this notice will avoid further proceedings.');
         where('DebtorID', '=', $trustActivity->DebtorID)
             ->get();
 //        echo $trustActivity->DateRcvd;
-        return view('accounting\trust\editTrustActivity', ['debtors' => $debtors, 'col' => $col,'trustActivity'=>$trustActivity]);
+        return view('accounting/trust/editTrustActivity', ['debtors' => $debtors, 'col' => $col,'trustActivity'=>$trustActivity]);
     }
     public function delTrust(Request $request){
         $result = rolerightsfield::where('RoleID','=',Auth::user()->is_permission)
@@ -2076,7 +2079,7 @@ Your prompt attention to this notice will avoid further proceedings.');
         $selected = null;
         if($request->Export != null){
             //$creditor = tblcreditor::get();
-            $creditor= \DB::select('select * from tblTrusts where TPaymentType=\'C\'');
+            $creditor= \DB::select('select * from tbltrusts where TPaymentType=\'C\'');
             return  $this->Export($creditor,'invoices');
         }
         if($request->DebtorID == null) {
@@ -2091,7 +2094,7 @@ Your prompt attention to this notice will avoid further proceedings.');
             where('DebtorID','=',$request->DebtorID)
                 ->get();
         }
-        return view('accounting\invoice\invoice', ['debtor' => $debtor,'selected'=>$selected]);
+        return view('accounting/invoice/invoice', ['debtor' => $debtor,'selected'=>$selected]);
     }
     public function unpaidInvoices(Request $request){
         $data=DB::select('SELECT tblInvoice.InvoiceNumb, tblInvoice.InvoiceNumb, tblInvoice.IPaymentID,
@@ -2118,7 +2121,7 @@ ORDER BY tblInvoice.InvoiceNumb DESC;');
             $sumOfDueInv+=floatval($c->DueInv);
             $sumOfCollected+=floatval($c->Collected);
         }
-        return view('accounting\invoice\AllUnpaidInvoice', ['data' => $data,'sumOfDueInv'=>$sumOfDueInv,'sumOfCollected'=>$sumOfCollected]);
+        return view('accounting/invoice/AllUnpaidInvoice', ['data' => $data,'sumOfDueInv'=>$sumOfDueInv,'sumOfCollected'=>$sumOfCollected]);
     }
     public function DeleteInvoice(Request $request){
         $result = rolerightsfield::where('RoleID','=',Auth::user()->is_permission)
@@ -2175,7 +2178,7 @@ ORDER BY tblInvoice.InvoiceNumb DESC;');
             $sumOfDueInv+=floatval($c->DueInv);
             $sumOfCollected+=floatval($c->Collected);
         }
-        return view('accounting\invoice\AllUnpaidInvoice', ['data' => $data,'sumOfDueInv'=>$sumOfDueInv,'sumOfCollected'=>$sumOfCollected]);
+        return view('accounting/invoice/AllUnpaidInvoice', ['data' => $data,'sumOfDueInv'=>$sumOfDueInv,'sumOfCollected'=>$sumOfCollected]);
     }
     public function addCredit(Request $request){
         $result = rolerightsfield::where('RoleID','=',Auth::user()->is_permission)
@@ -2194,7 +2197,7 @@ ORDER BY tblInvoice.InvoiceNumb DESC;');
         $selected = tblDebtor::
         where('DebtorID','=',$request->DebtorID)
             ->get();
-        return view('accounting\invoice\addCredit', ['debtors' => $debtors,'col' => $col,'selected'=>$selected]);
+        return view('accounting/invoice/addCredit', ['debtors' => $debtors,'col' => $col,'selected'=>$selected]);
     }
 
     public function saveCredit(Request $request){
@@ -2248,7 +2251,7 @@ ORDER BY tblInvoice.InvoiceNumb DESC;');
         $col = tblcollector::get();
         $debtors  = tblpmnttype::get();
         $trustActivity = tblTrust::where('TPaymentID','=',$request->TPaymentID)->first();
-        return view('accounting\invoice\addInvoice', ['debtors' => $debtors,'col' => $col,'trustActivity'=>$trustActivity]);
+        return view('accounting/invoice/addInvoice', ['debtors' => $debtors,'col' => $col,'trustActivity'=>$trustActivity]);
     }
     public function saveInvoice(Request $request){
 
@@ -2342,7 +2345,7 @@ ORDER BY tblInvoice.InvoiceNumb DESC;');
         }
         $invoice=tblinvoice::where('IPaymentID','=',$request->TPaymentID)->first();
 
-        return view('accounting\invoice\editInvoice',['invoice'=>$invoice]);
+        return view('accounting/invoice/editInvoice',['invoice'=>$invoice]);
     }
     public function UpdateInvoice(Request $request){
 
@@ -2353,7 +2356,7 @@ ORDER BY tblInvoice.InvoiceNumb DESC;');
 
         $trustActivity = tblinvoice::where('IPaymentID','=',$request->TPaymentID)->first();
         if($trustActivity == null){
-            return view('accounting\invoice\showInvoice',['trustActivity'=>$trustActivity]);
+            return view('accounting/invoice/showInvoice',['trustActivity'=>$trustActivity]);
         }
         $debtor = tblDebtor::where('DebtorID','=',$trustActivity->DebtorID)->first();
         $creditor = tblcontacts::where('CreditorID','=',$debtor->CreditorID)->first();
@@ -2372,7 +2375,7 @@ ORDER BY tblInvoice.InvoiceNumb DESC;');
         $PaidTrustNew=$PaidTrustNew1+$PaidTrustNew2;
         $total=$debtor->AmountPlaced-$PaidInv-$PaidTrustNew;
 
-        return view('accounting\invoice\showInvoice',['trustActivity'=>$trustActivity,'debtor'=>$debtor,'creditor'=>$creditor,'total'=>$total,'contact'=>$contact]);
+        return view('accounting/invoice/showInvoice',['trustActivity'=>$trustActivity,'debtor'=>$debtor,'creditor'=>$creditor,'total'=>$total,'contact'=>$contact]);
     }
 
     public function updatePaidInvoice(Request $request){
@@ -2390,12 +2393,12 @@ ORDER BY tblInvoice.InvoiceNumb DESC;');
 
     public  function DebtorReports(Request $request){
         $col = tblcollector::get();
-        return view('accounting\Reports\DebtorReports',['col'=>$col]);
+        return view('accounting/Reports/DebtorReports',['col'=>$col]);
     }
     public  function InvoiceReports(Request $request){
         $col = tblcollector::get();
         $sales = tblsales::get();
-        return view('accounting\Reports\InvoiceReports',['col'=>$col,'sales'=>$sales]);
+        return view('accounting/Reports/InvoiceReports',['col'=>$col,'sales'=>$sales]);
     }
     public  function showInvoiceReports(Request $request){
         $OpenInvoices=False;
@@ -2431,7 +2434,7 @@ case PaidDate when null then 'Unpaid' else 'Paid' end AS Paid
 TotalBillFor AS Collected,
 round(COALESCE((case Fee1Type when '%'  then (Fee1Balance/100)*Fee1 ELSE Fee1 end) -
 COALESCE(tblInvoice.AttyFees,0),0),2) AS DueInv
-FROM tblInvoices tblInvoice
+FROM tblinvoices tblInvoice
 WHERE (((tblInvoice.InvDate)>='".$request->sDate."' And (tblInvoice.InvDate)<='".$request->eDate."'))) qryInvoiceTotals");
         return response()->json($results);
         }
@@ -2455,8 +2458,8 @@ WHERE (((tblInvoice.InvDate)>='".$request->sDate."' And (tblInvoice.InvDate)<='"
             $StrFilter=' And '.$StrFilter;
         }
 
-       $results= \DB::select('SELECT  tblDebtors.CreditorID, tblInvoice.InvDate,
- tblTrust.PaymentReceived, tblDebtors.DebtorID,  tblDebtors.DebtorName,
+       $results= \DB::select('SELECT  tbldebtors.CreditorID, tblInvoice.InvDate,
+ tblTrust.PaymentReceived, tbldebtors.DebtorID,  tbldebtors.DebtorName,
  tblInvoice.InvoiceNumb, tblInvoice.PaidDate, tblInvoice.CAmountPaid,
  tblInvoice.TotalBillFor, tblInvoice.AttyFees, tblInvoice.Fee1Type, tblInvoice.Fee1Balance,
  tblInvoice.Fee1, tblInvoice.Fee2Type, tblInvoice.Fee2Balance, tblInvoice.Fee2,
@@ -2467,10 +2470,10 @@ COALESCE(Fee2Balance,0)+
 COALESCE(Fee3Balance,0) AS Collected,
 COALESCE((case Fee1Type when \'%\'  then (Fee1Balance/100)*Fee1 ELSE Fee1 end) -
 COALESCE(tblInvoice.AttyFees,0),0) AS DueInv
-FROM ((tblCreditors tblCreditor
-inner JOIN tblDebtors ON tblCreditor.CreditorID=tblDebtors.CreditorID)
-inner JOIN tblTrusts tblTrust ON tblDebtors.DebtorID=tblTrust.DebtorID)
-inner JOIN tblInvoices tblInvoice ON (tblTrust.TPaymentType=tblInvoice.IPaymentType) AND (tblTrust.TPaymentID=tblInvoice.IPaymentID)
+FROM ((tblcreditors tblCreditor
+inner JOIN tbldebtors ON tblCreditor.CreditorID=tbldebtors.CreditorID)
+inner JOIN tbltrusts tblTrust ON tbldebtors.DebtorID=tblTrust.DebtorID)
+inner JOIN tblinvoices tblInvoice ON (tblTrust.TPaymentType=tblInvoice.IPaymentType) AND (tblTrust.TPaymentID=tblInvoice.IPaymentID)
 WHERE  tblTrust.TPaymentType="C"  '.$StrFilter );
 
         return response()->json($results);
@@ -2498,21 +2501,21 @@ WHERE  tblTrust.TPaymentType="C"  '.$StrFilter );
                 })->export('xls');
             }
         }
-        return view('accounting\Reports\showInvoiceReports',['results'=>$results]);
+        return view('accounting/Reports/showInvoiceReports',['results'=>$results]);
     }
     public  function DebtorBySalemanReports(Request $request){
         $col = tblcollector::get();
-        return view('accounting\Reports\DebtorBySalemanReports');
+        return view('accounting/Reports/DebtorBySalemanReports');
     }
     public  function CreditorReports(Request $request){
         $saleman = tblsales::get();
-        return view('accounting\Reports\CreditorReports',['saleman'=>$saleman]);
+        return view('accounting/Reports/CreditorReports',['saleman'=>$saleman]);
     }
     public  function TrustReports(Request $request)
     {
         $col = tblcollector::get();
         $saleman = tblsales::get();
-        return view('accounting\Reports\TrustReports', ['col' => $col, 'saleman' => $saleman]);
+        return view('accounting/Reports/TrustReports', ['col' => $col, 'saleman' => $saleman]);
     }
     public  function showDebtorBySalemanReports(Request $request){
 
@@ -2520,18 +2523,18 @@ WHERE  tblTrust.TPaymentType="C"  '.$StrFilter );
         if($request->ReportType ==1){ $Filter='';}
         if($request->ReportType ==2){ $Filter='DateEntered >= \''.$request->sDate.'\' And DateEntered <=\''.$request->eDate.'\'';}
         if($request->ReportType ==3){ $Filter='DateEntered >= \''.$request->sDate.'\' And DateEntered <=\''.$request->eDate.'\' And AmountPlaced < 30000';}
-        if($request->ReportType ==4){ $Filter='tblDebtors.LastUpdate >= \''.$request->sDate.'\' And tblDebtors.LastUpdate <=\''.$request->eDate.'\' and tblDebtors.StatusID Not Like \'%z%\'';}
-        if($request->ReportType ==5){ $Filter='tblDebtors.LastUpdate >= \''.$request->sDate.'\' And tblDebtors.LastUpdate <=\''.$request->eDate.'\' and tblDebtors.StatusID Not Like \'%z%\' And AmountPlaced < 30000';}
-        if($request->ReportType ==6){ $Filter='tblDebtors.StatusID Not Like \'%z%\'';}
+        if($request->ReportType ==4){ $Filter='tbldebtors.LastUpdate >= \''.$request->sDate.'\' And tbldebtors.LastUpdate <=\''.$request->eDate.'\' and tbldebtors.StatusID Not Like \'%z%\'';}
+        if($request->ReportType ==5){ $Filter='tbldebtors.LastUpdate >= \''.$request->sDate.'\' And tbldebtors.LastUpdate <=\''.$request->eDate.'\' and tbldebtors.StatusID Not Like \'%z%\' And AmountPlaced < 30000';}
+        if($request->ReportType ==6){ $Filter='tbldebtors.StatusID Not Like \'%z%\'';}
 
         if($Filter != ''){
             $Filter =' where '.$Filter;
         }
 
-        $str='SELECT tblcreditors.CreditorID, tblcreditors.SaleID, tblDebtors.DebtorID, tblDebtors.DebtorName, tblDebtors.AmountPlaced,
- tblDebtors.StatusID, tblDebtors.DateEntered, Month(DateEntered) AS MonthOfPmnt, Year(DateEntered) AS ThisYear,
- tblcreditors.LastDate, tblDebtors.LastUpdate, ts.StatusDesc FROM tblcreditors
- inner JOIN tblDebtors ON tblcreditors.CreditorID = tblDebtors.CreditorID INNER  JOIN tblstatuses TS on ts.StatusID=tblDebtors.StatusID '.$Filter ;
+        $str='SELECT tblcreditors.CreditorID, tblcreditors.SaleID, tbldebtors.DebtorID, tbldebtors.DebtorName, tbldebtors.AmountPlaced,
+ tbldebtors.StatusID, tbldebtors.DateEntered, Month(DateEntered) AS MonthOfPmnt, Year(DateEntered) AS ThisYear,
+ tblcreditors.LastDate, tbldebtors.LastUpdate, ts.StatusDesc FROM tblcreditors
+ inner JOIN tbldebtors ON tblcreditors.CreditorID = tbldebtors.CreditorID INNER  JOIN tblstatuses TS on ts.StatusID=tbldebtors.StatusID '.$Filter ;
 
         $results= \DB::select($str);
         //DateEntered >= #9/1/2012# And DateEntered <= #9/30/2012# And AmountPlaced < 30000
@@ -2560,21 +2563,21 @@ WHERE  tblTrust.TPaymentType="C"  '.$StrFilter );
             }
         }
 
-        return view('accounting\Reports\showDebtorBySalemanReports',['results'=>$results]);
+        return view('accounting/Reports/showDebtorBySalemanReports',['results'=>$results]);
     }
     public  function showCreditorReports(Request $request){
 
         If ($request->ReportType == 4) {
             $CID='';
             if($request->CreditorID !=null){
-                $CID=' AND tblCreditors.CreditorID = "'.$request->CreditorID.'"';
+                $CID=' AND tblcreditors.CreditorID = "'.$request->CreditorID.'"';
             }
-            $results= \DB::select('SELECT tblCreditors.CreditorID, tblSales.SLastName, tblSales.SFirstName,
-tblCreditors.SaleID, tblCreditors.OpenDate, tblCreditors.Comments, tblCreditors.CompReport, tblCreditors.LastDate, tblContacts.ContactID,
- tblContacts.ClientName, tblContacts.Saltnt, tblContacts.CFirstName, tblContacts.CLastName, tblContacts.MainManager, tblContacts.Street,
- tblContacts.City, tblContacts.State, tblContacts.Zip, tblContacts.Phone, tblContacts.Fax, tblContacts.Ext
-  FROM (tblSales INNER JOIN tblCreditors ON tblSales.SalesID = tblCreditors.SaleID)
-  INNER JOIN tblContacts ON tblCreditors.CreditorID = tblContacts.CreditorID WHERE (((tblContacts.MainManager)=True)) '.$CID );
+            $results= \DB::select('SELECT tblcreditors.CreditorID, tblSales.SLastName, tblSales.SFirstName,
+tblcreditors.SaleID, tblcreditors.OpenDate, tblcreditors.Comments, tblcreditors.CompReport, tblcreditors.LastDate, tblcontacts.ContactID,
+ tblcontacts.ClientName, tblcontacts.Saltnt, tblcontacts.CFirstName, tblcontacts.CLastName, tblcontacts.MainManager, tblcontacts.Street,
+ tblcontacts.City, tblcontacts.State, tblcontacts.Zip, tblcontacts.Phone, tblcontacts.Fax, tblcontacts.Ext
+  FROM (tblSales INNER JOIN tblcreditors ON tblSales.SalesID = tblcreditors.SaleID)
+  INNER JOIN tblcontacts ON tblcreditors.CreditorID = tblcontacts.CreditorID WHERE (((tblcontacts.MainManager)=True)) '.$CID );
 
             //$paymentsArray = [];
 
@@ -2623,21 +2626,21 @@ tblCreditors.SaleID, tblCreditors.OpenDate, tblCreditors.Comments, tblCreditors.
                     })->export('xls');
                 }
             }
-            return view('accounting\Reports\rptCreditorsBYSales',['results'=>$results]);
+            return view('accounting/Reports/rptCreditorsBYSales',['results'=>$results]);
         }
         If ($request->ReportType == 5) {
             $CID='';
             if($request->CreditorID !=null){
                 $CID=' AND tblCreditor.CreditorID ="'.$request->CreditorID.'"';
             }
-            $str= 'SELECT tblCreditor.CreditorID, tblCreditor.SaleID, tblDebtors.DateEntered, tblDebtors.DebtorName, tblDebtors.DebtorID, tblDebtors.StatusID, tblDebtors.AmountPlaced, tblDebtors.ColID, qryTotalTrustPerDateLetters.SumOfNetClient, qryTotalPaymentsLetters.SumOfAmountPaid,ROUND(qryTotalTrustPerDateLetters.SumOfNetClient-qryTotalPaymentsLetters.SumOfAmountPaid ,2) \'AmountPd\',
- ROUND(tblDebtors.AmountPlaced-qryTotalTrustPerDateLetters.SumOfNetClient-qryTotalPaymentsLetters.SumOfAmountPaid ,2) \'BalanceDue\' from tblcreditors tblCreditor
-            INNER JOIN ((tblDebtors LEFT JOIN
-            (SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(PaymentReceived) AS SumOfNetClient FROM tblDebtors LEFT JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID WHERE tblTrust.TPaymentType="T" GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID)qryTotalTrustPerDateLetters ON tblDebtors.DebtorID = qryTotalTrustPerDateLetters.DebtorID)
-            LEFT JOIN (SELECT tblDebtors.CreditorID, tblTrusts.DebtorID, Sum(PaymentReceived) AS SumOfAmountPaid FROM tblDebtors LEFT JOIN tblTrusts ON tblDebtors.DebtorID = tblTrusts.DebtorID WHERE (((tblTrusts.TPaymentType)="C")) GROUP BY tblDebtors.CreditorID, tblTrusts.DebtorID) qryTotalPaymentsLetters
-            ON tblDebtors.DebtorID = qryTotalPaymentsLetters.DebtorID)
-            ON tblCreditor.CreditorID = tblDebtors.CreditorID
-            WHERE tblDebtors.DebtorName Is Not Null '.$CID.' and SaleID ='.$request->SalesID.'';
+            $str= 'SELECT tblCreditor.CreditorID, tblCreditor.SaleID, tbldebtors.DateEntered, tbldebtors.DebtorName, tbldebtors.DebtorID, tbldebtors.StatusID, tbldebtors.AmountPlaced, tbldebtors.ColID, qryTotalTrustPerDateLetters.SumOfNetClient, qryTotalPaymentsLetters.SumOfAmountPaid,ROUND(qryTotalTrustPerDateLetters.SumOfNetClient-qryTotalPaymentsLetters.SumOfAmountPaid ,2) \'AmountPd\',
+ ROUND(tbldebtors.AmountPlaced-qryTotalTrustPerDateLetters.SumOfNetClient-qryTotalPaymentsLetters.SumOfAmountPaid ,2) \'BalanceDue\' from tblcreditors tblCreditor
+            INNER JOIN ((tbldebtors LEFT JOIN
+            (SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(PaymentReceived) AS SumOfNetClient FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID WHERE tblTrust.TPaymentType="T" GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID)qryTotalTrustPerDateLetters ON tbldebtors.DebtorID = qryTotalTrustPerDateLetters.DebtorID)
+            LEFT JOIN (SELECT tbldebtors.CreditorID, tbltrusts.DebtorID, Sum(PaymentReceived) AS SumOfAmountPaid FROM tbldebtors LEFT JOIN tbltrusts ON tbldebtors.DebtorID = tbltrusts.DebtorID WHERE (((tbltrusts.TPaymentType)="C")) GROUP BY tbldebtors.CreditorID, tbltrusts.DebtorID) qryTotalPaymentsLetters
+            ON tbldebtors.DebtorID = qryTotalPaymentsLetters.DebtorID)
+            ON tblCreditor.CreditorID = tbldebtors.CreditorID
+            WHERE tbldebtors.DebtorName Is Not Null '.$CID.' and SaleID ='.$request->SalesID.'';
 
             $results= \DB::select($str);
             return response()->json($results);
@@ -2685,7 +2688,7 @@ tblCreditors.SaleID, tblCreditors.OpenDate, tblCreditors.Comments, tblCreditors.
                     })->export('xls');
                 }
             }
-            return view('accounting\Reports\rptSalemansDbtrs',['results'=>$results]);
+            return view('accounting/Reports/rptSalemansDbtrs',['results'=>$results]);
         }
 
         If ($request->ReportType == 6) {
@@ -2693,14 +2696,14 @@ tblCreditors.SaleID, tblCreditors.OpenDate, tblCreditors.Comments, tblCreditors.
             if($request->CreditorID !=null){
                 $CID=' AND tblCreditor.CreditorID = "'.$request->CreditorID.'"';
             }
-            $strQry='SELECT tblCreditor.CreditorID, tblCreditor.SaleID, tblDebtors.DateEntered, tblDebtors.DebtorName, tblDebtors.DebtorID, tblDebtors.StatusID, tblDebtors.AmountPlaced, tblDebtors.ColID, qryTotalTrustPerDateLetters.SumOfNetClient, qryTotalPaymentsLetters.SumOfAmountPaid,ROUND(qryTotalTrustPerDateLetters.SumOfNetClient-qryTotalPaymentsLetters.SumOfAmountPaid ,2) \'AmountPd\',
- ROUND(tblDebtors.AmountPlaced-qryTotalTrustPerDateLetters.SumOfNetClient-qryTotalPaymentsLetters.SumOfAmountPaid ,2) \'BalanceDue\' from tblcreditors tblCreditor
-            INNER JOIN ((tblDebtors LEFT JOIN
-            (SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(PaymentReceived) AS SumOfNetClient FROM tblDebtors INNER JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID WHERE tblTrust.TPaymentType="T" GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID)qryTotalTrustPerDateLetters ON tblDebtors.DebtorID = qryTotalTrustPerDateLetters.DebtorID)
-            LEFT JOIN (SELECT tblDebtors.CreditorID, tblTrusts.DebtorID, Sum(PaymentReceived) AS SumOfAmountPaid FROM tblDebtors INNER JOIN tblTrusts ON tblDebtors.DebtorID = tblTrusts.DebtorID WHERE (((tblTrusts.TPaymentType)="C")) GROUP BY tblDebtors.CreditorID, tblTrusts.DebtorID) qryTotalPaymentsLetters
-            ON tblDebtors.DebtorID = qryTotalPaymentsLetters.DebtorID)
-            ON tblCreditor.CreditorID = tblDebtors.CreditorID
-            WHERE tblDebtors.DebtorName Is Not Null '.$CID.' and SaleID = '. $request->SalesID .' AND DateEntered >="'.$request->sDate.'" And DateEntered <= "'.$request->eDate.'"';
+            $strQry='SELECT tblCreditor.CreditorID, tblCreditor.SaleID, tbldebtors.DateEntered, tbldebtors.DebtorName, tbldebtors.DebtorID, tbldebtors.StatusID, tbldebtors.AmountPlaced, tbldebtors.ColID, qryTotalTrustPerDateLetters.SumOfNetClient, qryTotalPaymentsLetters.SumOfAmountPaid,ROUND(qryTotalTrustPerDateLetters.SumOfNetClient-qryTotalPaymentsLetters.SumOfAmountPaid ,2) \'AmountPd\',
+ ROUND(tbldebtors.AmountPlaced-qryTotalTrustPerDateLetters.SumOfNetClient-qryTotalPaymentsLetters.SumOfAmountPaid ,2) \'BalanceDue\' from tblcreditors tblCreditor
+            INNER JOIN ((tbldebtors LEFT JOIN
+            (SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(PaymentReceived) AS SumOfNetClient FROM tbldebtors INNER JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID WHERE tblTrust.TPaymentType="T" GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID)qryTotalTrustPerDateLetters ON tbldebtors.DebtorID = qryTotalTrustPerDateLetters.DebtorID)
+            LEFT JOIN (SELECT tbldebtors.CreditorID, tbltrusts.DebtorID, Sum(PaymentReceived) AS SumOfAmountPaid FROM tbldebtors INNER JOIN tbltrusts ON tbldebtors.DebtorID = tbltrusts.DebtorID WHERE (((tbltrusts.TPaymentType)="C")) GROUP BY tbldebtors.CreditorID, tbltrusts.DebtorID) qryTotalPaymentsLetters
+            ON tbldebtors.DebtorID = qryTotalPaymentsLetters.DebtorID)
+            ON tblCreditor.CreditorID = tbldebtors.CreditorID
+            WHERE tbldebtors.DebtorName Is Not Null '.$CID.' and SaleID = '. $request->SalesID .' AND DateEntered >="'.$request->sDate.'" And DateEntered <= "'.$request->eDate.'"';
 
             $results= \DB::select($strQry);
             return response()-> json($results);
@@ -2748,7 +2751,7 @@ tblCreditors.SaleID, tblCreditors.OpenDate, tblCreditors.Comments, tblCreditors.
                     })->export('xls');
                 }
             }
-            return view('accounting\Reports\rptSalemansDbtrs',['results'=>$results]);
+            return view('accounting/Reports/rptSalemansDbtrs',['results'=>$results]);
         }
         $perms='';
         If ($request->ReportType == 2) {
@@ -2765,7 +2768,7 @@ tblCreditors.SaleID, tblCreditors.OpenDate, tblCreditors.Comments, tblCreditors.
             $perms=' AND tblCreditor.CreditorID = "'.$request->CreditorID.'" '.$perms;
         }
 
-        $results= \DB::select('SELECT tblContacts.ClientName,
+        $results= \DB::select('SELECT tblcontacts.ClientName,
                              tblCreditor.CreditorID, tblCreditor.SaleID, tblCreditor.OpenDate, tblCreditor.LastDate,
                             COALESCE(qryCountOfDebt.CountOfDebtorID,0)CountOfDebtorID,
                            ROUND( COALESCE(qryTotalPlacedAll.SumOfAmountPlaced,0),2)SumOfAmountPlaced,
@@ -2775,14 +2778,14 @@ tblCreditors.SaleID, tblCreditors.OpenDate, tblCreditors.Comments, tblCreditors.
                             ROUND(  COALESCE(qryAGrossDbtrAll.SumOfAgencyGross,0),2)+ROUND(COALESCE(qryInvoiceDbtrAll.DueInv,0),2)FEES,
                             ROUND(COALESCE(qryTotalClctCrdtsAll.Credits,0),2)+ROUND(COALESCE(qryTotalTrustPerCreditorAll.SumOfNetClient,0),2)DLRCOL,
                             ROUND(COALESCE(qryTotalTrustPerCreditorAll.SumOfNetClient,0),2)SumOfNetClient from tblcreditors tblCreditor
-                            INNER JOIN (SELECT tblDebtors.CreditorID, Count(tblDebtors.DebtorID) AS CountOfDebtorID FROM tblDebtors GROUP BY tblDebtors.CreditorID) qryCountOfDebt ON tblCreditor.CreditorID = qryCountOfDebt.CreditorID
-                            INNER JOIN (SELECT tblDebtors.CreditorID, Sum(tblDebtors.AmountPlaced) AS SumOfAmountPlaced FROM tblDebtors GROUP BY tblDebtors.CreditorID)qryTotalPlacedAll ON tblCreditor.CreditorID = qryTotalPlacedAll.CreditorID
-                            LEFT JOIN (SELECT tblDebtors.CreditorID, Sum(tblTrust.PaymentReceived) AS Credits FROM tblDebtors INNER JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID WHERE (((tblTrust.TPaymentType)="C")) GROUP BY tblDebtors.CreditorID)qryTotalClctCrdtsAll ON tblCreditor.CreditorID = qryTotalClctCrdtsAll.CreditorID
-                            LEFT JOIN (SELECT  tblDebtors.CreditorID, Sum(tblTrust.PaymentReceived) AS SumOfNetClient FROM tblDebtors LEFT JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID WHERE tblTrust.TPaymentType="T" GROUP BY tblDebtors.CreditorID)qryTotalTrustPerCreditorAll ON tblCreditor.CreditorID = qryTotalTrustPerCreditorAll.CreditorID
-                            LEFT JOIN (SELECT tblDebtors.CreditorID, Sum(tblTrust.AgencyGross) AS SumOfAgencyGross FROM tblDebtors INNER JOIN tbltrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID WHERE tblTrust.TPaymentType="T" GROUP BY tblDebtors.CreditorID)qryAGrossDbtrAll ON tblCreditor.CreditorID = qryAGrossDbtrAll.CreditorID
-                            LEFT JOIN (SELECT tblDebtors.CreditorID, COALESCE(SUM((case Fee1Type when \'%\' then (Fee1Balance / 100)*Fee1 ELSE Fee1 end )+ (case Fee2Type when \'%\' then (Fee2Balance / 100)*Fee2 ELSE Fee2 end )+ (case Fee3Type when \'%\' then (Fee3Balance / 100)*Fee3 ELSE Fee3 end )),0) as DueInv FROM tblDebtors INNER JOIN tblinvoices tblInvoice ON tblDebtors.DebtorID = tblInvoice.DebtorID GROUP BY tblDebtors.CreditorID)qryInvoiceDbtrAll ON tblCreditor.CreditorID = qryInvoiceDbtrAll.CreditorID
-                            LEFT JOIN tblContacts ON tblCreditor.CreditorID = tblContacts.CreditorID WHERE tblContacts.MainManager=True '. $perms .'
-                            ORDER BY tblContacts.ClientName, tblCreditor.CreditorID;');
+                            INNER JOIN (SELECT tbldebtors.CreditorID, Count(tbldebtors.DebtorID) AS CountOfDebtorID FROM tbldebtors GROUP BY tbldebtors.CreditorID) qryCountOfDebt ON tblCreditor.CreditorID = qryCountOfDebt.CreditorID
+                            INNER JOIN (SELECT tbldebtors.CreditorID, Sum(tbldebtors.AmountPlaced) AS SumOfAmountPlaced FROM tbldebtors GROUP BY tbldebtors.CreditorID)qryTotalPlacedAll ON tblCreditor.CreditorID = qryTotalPlacedAll.CreditorID
+                            LEFT JOIN (SELECT tbldebtors.CreditorID, Sum(tblTrust.PaymentReceived) AS Credits FROM tbldebtors INNER JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID WHERE (((tblTrust.TPaymentType)="C")) GROUP BY tbldebtors.CreditorID)qryTotalClctCrdtsAll ON tblCreditor.CreditorID = qryTotalClctCrdtsAll.CreditorID
+                            LEFT JOIN (SELECT  tbldebtors.CreditorID, Sum(tblTrust.PaymentReceived) AS SumOfNetClient FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID WHERE tblTrust.TPaymentType="T" GROUP BY tbldebtors.CreditorID)qryTotalTrustPerCreditorAll ON tblCreditor.CreditorID = qryTotalTrustPerCreditorAll.CreditorID
+                            LEFT JOIN (SELECT tbldebtors.CreditorID, Sum(tblTrust.AgencyGross) AS SumOfAgencyGross FROM tbldebtors INNER JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID WHERE tblTrust.TPaymentType="T" GROUP BY tbldebtors.CreditorID)qryAGrossDbtrAll ON tblCreditor.CreditorID = qryAGrossDbtrAll.CreditorID
+                            LEFT JOIN (SELECT tbldebtors.CreditorID, COALESCE(SUM((case Fee1Type when \'%\' then (Fee1Balance / 100)*Fee1 ELSE Fee1 end )+ (case Fee2Type when \'%\' then (Fee2Balance / 100)*Fee2 ELSE Fee2 end )+ (case Fee3Type when \'%\' then (Fee3Balance / 100)*Fee3 ELSE Fee3 end )),0) as DueInv FROM tbldebtors INNER JOIN tblinvoices tblInvoice ON tbldebtors.DebtorID = tblInvoice.DebtorID GROUP BY tbldebtors.CreditorID)qryInvoiceDbtrAll ON tblCreditor.CreditorID = qryInvoiceDbtrAll.CreditorID
+                            LEFT JOIN tblcontacts ON tblCreditor.CreditorID = tblcontacts.CreditorID WHERE tblcontacts.MainManager=True '. $perms .'
+                            ORDER BY tblcontacts.ClientName, tblCreditor.CreditorID;');
 
         return response()-> json($results);
         if($request->view == 'Export'){
@@ -2828,7 +2831,7 @@ tblCreditors.SaleID, tblCreditors.OpenDate, tblCreditors.Comments, tblCreditors.
                 })->export('xls');
             }
         }
-        return view('accounting\Reports\rptCreditorsTotals',['results'=>$results]);
+        return view('accounting/Reports/rptCreditorsTotals',['results'=>$results]);
     }
     public  function showDebtorReports(Request $request){
 
@@ -2836,24 +2839,24 @@ tblCreditors.SaleID, tblCreditors.OpenDate, tblCreditors.Comments, tblCreditors.
         $newString='%Z%';
 
         if ($request->ReportType ==1){
-            $strFilterColl = "tblCollectors.ColID = 0";
+            $strFilterColl = "tblcollectors.ColID = 0";
         }
         elseif ($request->ReportType ==2){
-            $strFilterColl = "tblCollectors.ColID =". $request->colID ."";
+            $strFilterColl = "tblcollectors.ColID =". $request->colID ."";
         }
 
         elseif ($request->ReportType ==3){
             $strFilterColl = "";
         }
         elseif ($request->ReportType ==4){
-            $strFilterColl = "tblDebtors.AmountPlaced < 30000";
+            $strFilterColl = "tbldebtors.AmountPlaced < 30000";
         }
         if ($request->chkActiveOnly ==true){
             If ($strFilterColl == "")
             {
-                $strFilterColl = "tblDebtors.StatusID Like '".$newString."'";
+                $strFilterColl = "tbldebtors.StatusID Like '".$newString."'";
             }else{
-                $strFilterColl = $strFilterColl. " AND tblDebtors.StatusID Like '%Z%'";
+                $strFilterColl = $strFilterColl. " AND tbldebtors.StatusID Like '%Z%'";
             }
         }
         if ($strFilterColl != ''){
@@ -2865,30 +2868,30 @@ TC.ColID,TC.CLastName, TC.CFirstName,
  round(TD.AmountPlaced,2)-round (qryTotalPaymentsLetters.SumOfAmountPaid,2)BalanceDue
  from tbldebtors TD
 INNER JOIN tblcollectors TC on TD.ColID=TC.ColID
-INNER JOIN (SELECT tblTrusts.DebtorID, Sum(PaymentReceived) AS SumOfAmountPaid FROM tblDebtors INNER JOIN tblTrusts ON tblDebtors.DebtorID = tblTrusts.DebtorID  WHERE (((tblTrusts.TPaymentType)="C")) GROUP BY tblTrusts.DebtorID) as qryTotalPaymentsLetters on qryTotalPaymentsLetters.DebtorID = TD.DebtorID
-INNER JOIN (SELECT tblTrusts.DebtorID, Sum(tblTrusts.CostRef) AS CostRef,
-Sum(PaymentReceived) AS SumOfNetClient FROM tblDebtors
- INNER JOIN tblTrusts ON tblDebtors.DebtorID = tblTrusts.DebtorID
+INNER JOIN (SELECT tbltrusts.DebtorID, Sum(PaymentReceived) AS SumOfAmountPaid FROM tbldebtors INNER JOIN tbltrusts ON tbldebtors.DebtorID = tbltrusts.DebtorID  WHERE (((tbltrusts.TPaymentType)="C")) GROUP BY tbltrusts.DebtorID) as qryTotalPaymentsLetters on qryTotalPaymentsLetters.DebtorID = TD.DebtorID
+INNER JOIN (SELECT tbltrusts.DebtorID, Sum(tbltrusts.CostRef) AS CostRef,
+Sum(PaymentReceived) AS SumOfNetClient FROM tbldebtors
+ INNER JOIN tbltrusts ON tbldebtors.DebtorID = tbltrusts.DebtorID
  GROUP by tbldebtors.CreditorID,tbltrusts.DebtorID) QueryTrust
  ON QueryTrust.DebtorID = TD.DebtorID ';
-        $str='SELECT tblDebtors.StatusID, tblDebtors.DebtorID, tblDebtors.DebtorName, tblDebtors.Phone,
- tblCollectors.ColID, tblCollectors.CLastName, tblCollectors.CFirstName,
-  COALESCE(tblDebtors.AmountPlaced,0)AmountPlaced, 
+        $str='SELECT tbldebtors.StatusID, tbldebtors.DebtorID, tbldebtors.DebtorName, tbldebtors.Phone,
+ tblcollectors.ColID, tblcollectors.CLastName, tblcollectors.CFirstName,
+  COALESCE(tbldebtors.AmountPlaced,0)AmountPlaced, 
   COALESCE(qryTotalPaymentsLetters.SumOfAmountPaid,0)SumOfAmountPaid, 
-  COALESCE(tblDebtors.AmountPlaced,0)-COALESCE(qryTotalPaymentsLetters.SumOfAmountPaid,0)BalanceDue, 
+  COALESCE(tbldebtors.AmountPlaced,0)-COALESCE(qryTotalPaymentsLetters.SumOfAmountPaid,0)BalanceDue, 
   COALESCE(qryTotalTrustPerDateLetters.SumOfNetClient,0)SumOfNetClient
-FROM ((tblCollectors 
-       RIGHT JOIN tblDebtors ON tblCollectors.ColID= tblDebtors.ColID) 
-      LEFT JOIN (SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.PaymentReceived) AS SumOfAmountPaid
-FROM tblDebtors LEFT JOIN tblTrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
+FROM ((tblcollectors 
+       RIGHT JOIN tbldebtors ON tblcollectors.ColID= tbldebtors.ColID) 
+      LEFT JOIN (SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.PaymentReceived) AS SumOfAmountPaid
+FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
 WHERE (((tblTrust.TPaymentType)="C"))
-GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID)qryTotalPaymentsLetters ON tblDebtors.DebtorID = qryTotalPaymentsLetters.DebtorID) 
-      LEFT JOIN (SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(tblTrust.PaymentReceived+COALESCE(tblTrust.AttyFees,0)) AS SumOfNetClient
-FROM tblDebtors LEFT JOIN tblTrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
+GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID)qryTotalPaymentsLetters ON tbldebtors.DebtorID = qryTotalPaymentsLetters.DebtorID) 
+      LEFT JOIN (SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(tblTrust.PaymentReceived+COALESCE(tblTrust.AttyFees,0)) AS SumOfNetClient
+FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
 WHERE (((tblTrust.TPaymentType)="T") AND ((tblTrust.DateRcvd)>\'5/29/2000\'))
-GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID)qryTotalTrustPerDateLetters ON tblDebtors.DebtorID = qryTotalTrustPerDateLetters.DebtorID
+GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID)qryTotalTrustPerDateLetters ON tbldebtors.DebtorID = qryTotalTrustPerDateLetters.DebtorID
      '.$strFilterColl.'        
-GROUP BY tblDebtors.StatusID, tblDebtors.DebtorID, tblDebtors.DebtorName, tblDebtors.Phone, tblCollectors.ColID, tblCollectors.CLastName, tblCollectors.CFirstName, tblDebtors.AmountPlaced, qryTotalPaymentsLetters.SumOfAmountPaid, qryTotalTrustPerDateLetters.SumOfNetClient
+GROUP BY tbldebtors.StatusID, tbldebtors.DebtorID, tbldebtors.DebtorName, tbldebtors.Phone, tblcollectors.ColID, tblcollectors.CLastName, tblcollectors.CFirstName, tbldebtors.AmountPlaced, qryTotalPaymentsLetters.SumOfAmountPaid, qryTotalTrustPerDateLetters.SumOfNetClient
 ';
         $results= \DB::select($str);
         return response()->json($results);
@@ -2896,8 +2899,8 @@ GROUP BY tblDebtors.StatusID, tblDebtors.DebtorID, tblDebtors.DebtorName, tblDeb
 TC.CLastName, TC.CFirstName, TD.AmountPlaced,
  qryTotalPaymentsLetters.SumOfAmountPaid, QueryTrust.SumOfNetClient from tbldebtors TD
 RIGHT JOIN tblcollectors TC on TD.ColID=TC.ColID
-LEFT JOIN (SELECT tblDebtors.CreditorID, tblTrusts.DebtorID, Sum(PaymentReceived) AS SumOfAmountPaid FROM tblDebtors LEFT JOIN tblTrusts ON tblDebtors.DebtorID = tblTrusts.DebtorID WHERE (((tblTrusts.TPaymentType)="C")) GROUP BY tblDebtors.CreditorID, tblTrusts.DebtorID) as qryTotalPaymentsLetters on qryTotalPaymentsLetters.DebtorID = TD.DebtorID
-LEFT JOIN (SELECT tblDebtors.CreditorID, tblTrusts.DebtorID, Sum(tblTrusts.CostRef) AS CostRef, Sum(PaymentReceived) AS SumOfNetClient FROM tblDebtors LEFT JOIN tblTrusts ON tblDebtors.DebtorID = tblTrusts.DebtorID GROUP by tbldebtors.CreditorID,tbltrusts.DebtorID) QueryTrust ON QueryTrust.DebtorID = TD.DebtorID '  );
+LEFT JOIN (SELECT tbldebtors.CreditorID, tbltrusts.DebtorID, Sum(PaymentReceived) AS SumOfAmountPaid FROM tbldebtors LEFT JOIN tbltrusts ON tbldebtors.DebtorID = tbltrusts.DebtorID WHERE (((tbltrusts.TPaymentType)="C")) GROUP BY tbldebtors.CreditorID, tbltrusts.DebtorID) as qryTotalPaymentsLetters on qryTotalPaymentsLetters.DebtorID = TD.DebtorID
+LEFT JOIN (SELECT tbldebtors.CreditorID, tbltrusts.DebtorID, Sum(tbltrusts.CostRef) AS CostRef, Sum(PaymentReceived) AS SumOfNetClient FROM tbldebtors LEFT JOIN tbltrusts ON tbldebtors.DebtorID = tbltrusts.DebtorID GROUP by tbldebtors.CreditorID,tbltrusts.DebtorID) QueryTrust ON QueryTrust.DebtorID = TD.DebtorID '  );
 */
         if($request->view == 'Export'){
             if($request->Export == 'PDF'){
@@ -2941,7 +2944,7 @@ LEFT JOIN (SELECT tblDebtors.CreditorID, tblTrusts.DebtorID, Sum(tblTrusts.CostR
                 })->export('xls');
             }
         }
-        return view('accounting\Reports\showDebtorReports',['results'=>$results]);
+        return view('accounting/Reports/showDebtorReports',['results'=>$results]);
     }
     public  function showTrustReports(Request $request){
         $parms=' AND DateRcvd BETWEEN "'.$request->Year.'-'.$request->Month.'-01" and "'.$request->Year.'-'.$request->Month.'-31" ';
@@ -2955,15 +2958,15 @@ LEFT JOIN (SELECT tblDebtors.CreditorID, tblTrusts.DebtorID, Sum(tblTrusts.CostR
             $parms = '  AND DateRcvd BETWEEN "'.$request->sDate.'" and "'.$request->eDate.'"  AND tblCreditor.CreditorID="'.$request->CreditorID.'"';
         }
         If ($request->ReportType == 5) {
-            $parms = ' AND DateRcvd BETWEEN "'.$request->sDate.'" and "'.$request->eDate.'" AND tblDebtors.DebtorID='.$request->DebtorID;
+            $parms = ' AND DateRcvd BETWEEN "'.$request->sDate.'" and "'.$request->eDate.'" AND tbldebtors.DebtorID='.$request->DebtorID;
         }
-        $str='SELECT tblCreditor.SaleID, tblTrust.ColID, tblCreditor.CreditorID, tblDebtors.DebtorName,tblDebtors.ClientAcntNumber, tblTrust.DebtorID, tblTrust.TPaymentID, tblTrust.TPaymentType, tblTrust.DateRcvd, tblTrust.CheckNumb, tblTrust.RelDate, tblTrust.ColID, 
+        $str='SELECT tblCreditor.SaleID, tblTrust.ColID, tblCreditor.CreditorID, tbldebtors.DebtorName,tbldebtors.ClientAcntNumber, tblTrust.DebtorID, tblTrust.TPaymentID, tblTrust.TPaymentType, tblTrust.DateRcvd, tblTrust.CheckNumb, tblTrust.RelDate, tblTrust.ColID, 
 ClastName & " " & CFirstName AS Collector,
 COALESCE(AgencyGross,0)-COALESCE(AttyFees,0)+COALESCE(Intrest,0)+COALESCE(MiscFees,0) AS AgencyNet, 
 Month(DateRcvd) AS MonthOfPmnt,
 Year(DateRcvd) AS ThisYear, 
 COALESCE(PaymentReceived,0)-COALESCE(MiscFees,0)+COALESCE(CostRef,0) AS NetClient
-FROM tblCreditors tblCreditor LEFT JOIN ((tblTrusts tblTrust RIGHT JOIN tblDebtors ON tblTrust.DebtorID = tblDebtors.DebtorID) LEFT JOIN tblCollectors ON tblTrust.ColID = tblCollectors.ColID) ON tblCreditor.CreditorID = tblDebtors.CreditorID
+FROM tblcreditors tblCreditor LEFT JOIN ((tbltrusts tblTrust RIGHT JOIN tbldebtors ON tblTrust.DebtorID = tbldebtors.DebtorID) LEFT JOIN tblcollectors ON tblTrust.ColID = tblcollectors.ColID) ON tblCreditor.CreditorID = tbldebtors.CreditorID
 WHERE tblTrust.TPaymentType="T" '.$parms.'
 ORDER BY tblTrust.DateRcvd DESC;
 ';
@@ -2972,7 +2975,7 @@ $results= \DB::select($str);
 
         /*$results= \DB::select('SELECT tblCreditor.SaleID,
                              tblTrust.ColID, tblCreditor.CreditorID,
-                            tblDebtors.DebtorName, tblTrust.DebtorID, tblTrust.TPaymentID,
+                            tbldebtors.DebtorName, tblTrust.DebtorID, tblTrust.TPaymentID,
                              tblTrust.TPaymentType, tblTrust.DateRcvd, tblTrust.CheckNumb,
                              tblTrust.RelDate, tblTrust.ColID,
                             ClastName ,CFirstName,
@@ -2986,19 +2989,19 @@ $results= \DB::select($str);
                              (CASE MiscFees WHEN null THEN 0 ELSE MiscFees END )+(CASE CostRef WHEN null THEN 0 ELSE CostRef END )) AS NetClient
                             FROM tblcreditors tblCreditor
                              LEFT JOIN ((tbltrusts tblTrust
-                            RIGHT JOIN tblDebtors ON tblTrust.DebtorID = tblDebtors.DebtorID)
-                            LEFT JOIN tblCollectors ON tblTrust.ColID = tblCollectors.ColID)
-                            ON tblCreditor.CreditorID = tblDebtors.CreditorID
+                            RIGHT JOIN tbldebtors ON tblTrust.DebtorID = tbldebtors.DebtorID)
+                            LEFT JOIN tblcollectors ON tblTrust.ColID = tblcollectors.ColID)
+                            ON tblCreditor.CreditorID = tbldebtors.CreditorID
                             WHERE (((tblTrust.TPaymentType)="T") AND  EXTRACT(YEAR_MONTH FROM DateRcvd)=\''.c.''.$request->Month.'\''.$parms.')
                             ORDER BY tblTrust.DateRcvd DESC;');*/
-       /* $results_Creditor= \DB::select('SELECT tblDebtors.DebtorName, tblCreditor.CreditorID, tblTrust.PaymentReceived,
+       /* $results_Creditor= \DB::select('SELECT tbldebtors.DebtorName, tblCreditor.CreditorID, tblTrust.PaymentReceived,
 tblCreditor.SaleID,
 ((CASE PaymentReceived WHEN null THEN 0 ELSE PaymentReceived END )-
 (CASE MiscFees WHEN null THEN 0 ELSE MiscFees END )+
 (CASE CostRef WHEN null THEN 0 ELSE CostRef END )-
 (CASE agencygross WHEN null THEN 0 ELSE agencygross END )+
 (CASE attyfees WHEN null THEN 0 ELSE attyfees END )) AS NetClient,
-tblDebtors.ClientAcntNumber, tblTrust.ColID, tblTrust.DebtorID,
+tbldebtors.ClientAcntNumber, tblTrust.ColID, tblTrust.DebtorID,
 tblTrust.TPaymentID, tblTrust.TPaymentType, tblTrust.DateRcvd, tblTrust.CheckNumb, tblTrust.RelDate, tblTrust.ColID,
 ClastName , CFirstName ,
 
@@ -3011,11 +3014,11 @@ Month(DateRcvd) AS MonthOfPmnt,
 Year(DateRcvd) AS ThisYear,
 ((CASE PaymentReceived WHEN null THEN 0 ELSE PaymentReceived END )-
 (CASE AttyFees WHEN null THEN 0 ELSE AttyFees END )) AS GrossClient
-FROM tblcreditors tblCreditor LEFT JOIN ((tbltrusts tblTrust RIGHT JOIN tblDebtors ON tblTrust.DebtorID=tblDebtors.DebtorID)
-LEFT JOIN tblCollectors ON tblTrust.ColID=tblCollectors.ColID) ON tblCreditor.CreditorID=tblDebtors.CreditorID
+FROM tblcreditors tblCreditor LEFT JOIN ((tbltrusts tblTrust RIGHT JOIN tbldebtors ON tblTrust.DebtorID=tbldebtors.DebtorID)
+LEFT JOIN tblcollectors ON tblTrust.ColID=tblcollectors.ColID) ON tblCreditor.CreditorID=tbldebtors.CreditorID
 WHERE tblTrust.TPaymentType="T" And (tblTrust.DateRcvd)>=\'\' And (tblTrust.DateRcvd)<=\'\' AND tblCreditor.CreditorID=" Any"
-ORDER BY tblDebtors.DebtorName, tblTrust.DateRcvd DESC;');*/
-        //rightJoin('tblcollectors','tblcollectors.ColID','=','tblDebtors.ColID')->get();
+ORDER BY tbldebtors.DebtorName, tblTrust.DateRcvd DESC;');*/
+        //rightJoin('tblcollectors','tblcollectors.ColID','=','tbldebtors.ColID')->get();
         return response()->json($results);
         if($request->view == 'Export'){
             if($request->Export == 'PDF'){
@@ -3059,7 +3062,7 @@ ORDER BY tblDebtors.DebtorName, tblTrust.DateRcvd DESC;');*/
                 })->export('xls');
             }
         }
-        return view('accounting\Reports\showTrustReports',['results'=>$results]);
+        return view('accounting/Reports/showTrustReports',['results'=>$results]);
     }
     public function  Export($results,$name){
         $paymentsArray = array();
@@ -3076,7 +3079,7 @@ ORDER BY tblDebtors.DebtorName, tblTrust.DateRcvd DESC;');*/
         })->export('xls');
     }
     public  function CreditorsSummary(Request $request){
-        return view('accounting\Reports\CreditorsSummary',["creditorID"=>$request->creditorID]);
+        return view('accounting/Reports/CreditorsSummary',["creditorID"=>$request->creditorID]);
     }
     public  function ShowCreditorsSummary(Request $request){
         $filter='';
@@ -3091,8 +3094,8 @@ ORDER BY tblDebtors.DebtorName, tblTrust.DateRcvd DESC;');*/
             $filter=$filter .' and TD.DateEntered >="'.$request->sDate.'" AND TD.DateEntered <="'.$request->eDate.'"';
         }
 
-        $str='SELECT DISTINCT TD.DebtorID, tblCreditor.CompReport, tblCreditor.OpenDate, tblContacts.ClientName, tblContacts.Saltnt, 
-tblContacts.CFirstName, tblStatus.StatusDesc, tblContacts.CLastName, TD.CreditorID, TD.ColID, TD.ContactID,
+        $str='SELECT DISTINCT TD.DebtorID, tblCreditor.CompReport, tblCreditor.OpenDate, tblcontacts.ClientName, tblcontacts.Saltnt, 
+tblcontacts.CFirstName, tblStatus.StatusDesc, tblcontacts.CLastName, TD.CreditorID, TD.ColID, TD.ContactID,
  TD.DateEntered, TD.Salutation, TD.DebtorName, TD.DFirstName, TD.DLastName, TD.Street, TD.City, TD.State, TD.Zip, TD.Phone,
   TD.ClientAcntNumber, TD.StatusID, TD.LastDate, ROUND(TD.AmountPlaced,2)AmountPlaced, TD.FormDate, ROUND(TD.CostAdv,2)CostAdv, 
   ROUND(qryTotalTrustPerDateLetters.CostRef,2) AS CostRec, TD.SuitFee, TD.Fees,
@@ -3100,22 +3103,22 @@ tblContacts.CFirstName, tblStatus.StatusDesc, tblContacts.CLastName, TD.Creditor
    ROUND(COALESCE(qryTotalPaymentsLetters.SumOfAmountPaid,0),2)SumOfAmountPaid,
 ROUND(COALESCE(ROUND(COALESCE(qryTotalTrustPerDateLetters.SumOfNetClient,0),2)+ROUND(COALESCE(qryTotalPaymentsLetters.SumOfAmountPaid,0),2) ,0),2)AmountPaid
 ,ROUND(COALESCE(TD.AmountPlaced,0) -COALESCE(COALESCE(qryTotalTrustPerDateLetters.SumOfNetClient,0)+COALESCE(qryTotalPaymentsLetters.SumOfAmountPaid,0) ,0),2) BalanceDue, COALESCE((SumTotalFees),0) AS SumOfTotalFees
-FROM tblCreditors tblCreditor 
+FROM tblcreditors tblCreditor 
 	  INNER JOIN tbldebtors TD ON tblCreditor.CreditorID = TD.CreditorID
-      INNER JOIN tblContacts ON tblCreditor.CreditorID = tblContacts.CreditorID AND tblContacts.MainManager=True
-       LEFT JOIN tblstatuses tblStatus ON td.StatusID = tblStatus.StatusID 
-       LEFT JOIN (SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.PaymentReceived) AS SumOfAmountPaid FROM tblDebtors LEFT JOIN tblTrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID WHERE (((tblTrust.TPaymentType)="C")) GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID) qryTotalPaymentsLetters 
+      INNER JOIN tblcontacts ON tblCreditor.CreditorID = tblcontacts.CreditorID AND tblcontacts.MainManager=True
+       LEFT JOIN tblstatuses tblStatus ON TD.StatusID = tblStatus.StatusID 
+       LEFT JOIN (SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.PaymentReceived) AS SumOfAmountPaid FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID WHERE (((tblTrust.TPaymentType)="C")) GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID) qryTotalPaymentsLetters 
       ON TD.DebtorID = qryTotalPaymentsLetters.DebtorID
-      LEFT JOIN (SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(tblTrust.PaymentReceived+COALESCE(tblTrust.AttyFees,0)) AS SumOfNetClient FROM tblDebtors LEFT JOIN tblTrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
+      LEFT JOIN (SELECT DISTINCTROW tbldebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(tblTrust.PaymentReceived+COALESCE(tblTrust.AttyFees,0)) AS SumOfNetClient FROM tbldebtors LEFT JOIN tbltrusts tblTrust ON tbldebtors.DebtorID = tblTrust.DebtorID
 WHERE (((tblTrust.TPaymentType)="T") AND ((tblTrust.DateRcvd)>"5/29/2000"))
-GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID) qryTotalTrustPerDateLetters 
+GROUP BY tbldebtors.CreditorID, tblTrust.DebtorID) qryTotalTrustPerDateLetters 
                    ON TD.DebtorID = qryTotalTrustPerDateLetters.DebtorID
- LEFT JOIN (SELECT tblInvoice.DebtorID, SUM(COALESCE(tblInvoice.Fee1,0)+COALESCE(tblInvoice.Fee2,0)+COALESCE(tblInvoice.Fee3,0)) AS Inv_Fees FROM tblinvoices tblInvoice GROUP BY tblInvoice.DebtorID) qryInvoice_Fees   ON td.DebtorID = qryInvoice_Fees.DebtorID
+ LEFT JOIN (SELECT tblInvoice.DebtorID, SUM(COALESCE(tblInvoice.Fee1,0)+COALESCE(tblInvoice.Fee2,0)+COALESCE(tblInvoice.Fee3,0)) AS Inv_Fees FROM tblinvoices tblInvoice GROUP BY tblInvoice.DebtorID) qryInvoice_Fees   ON TD.DebtorID = qryInvoice_Fees.DebtorID
  LEFT JOIN (SELECT DebtorID,sum(TotalFees)SumTotalFees FROM (SELECT tblInvoice.DebtorID,
 SUM(COALESCE(tblInvoice.Fee1,0)+COALESCE(tblInvoice.Fee2,0)+COALESCE(tblInvoice.Fee3,0)) AS TotalFees FROM tblinvoices tblInvoice GROUP BY tblInvoice.DebtorID
 UNION
 SELECT tblTrust.DebtorID,  Sum(COALESCE(tblTrust.Intrest,0)+COALESCE(tblTrust.MiscFees,0)+COALESCE(tblTrust.AgencyGross,0)) AS TotalFees FROM tbltrusts tblTrust GROUP BY tblTrust.DebtorID)aa )qryTotal_Fees_Final 
-                 ON td.DebtorID = qryTotal_Fees_Final.DebtorID
+                 ON TD.DebtorID = qryTotal_Fees_Final.DebtorID
                  '.$filter;
 
         $results= \DB::select($str);
@@ -3124,7 +3127,7 @@ SELECT tblTrust.DebtorID,  Sum(COALESCE(tblTrust.Intrest,0)+COALESCE(tblTrust.Mi
 
     public function ImportExport(Request $request){
 
-        return view('accounting\ImportExport\ImportExport');
+        return view('accounting/ImportExport/ImportExport');
     }
 
     public function postUploadCsv(Request $request)
@@ -3136,9 +3139,9 @@ SELECT tblTrust.DebtorID,  Sum(COALESCE(tblTrust.Intrest,0)+COALESCE(tblTrust.Mi
                 $data = Excel::load(\Input::file('Collector'))->get();
                 foreach ($data as $key => $row) {
                     if($row->has('colid') == true && $row->has('clastname') && $row->has('cfirstname') == true && $row->has('closing') == true){
-                    $isExist = tblCollector::where('ColID','=',$row->colid)->first();
+                    $isExist = tblcollector::where('ColID','=',$row->colid)->first();
                     if($isExist  ==null){
-                        $newCollector = new tblCollector();
+                        $newCollector = new tblcollector();
 
                         $newCollector->ColID = $row->colid;
                         $newCollector->CLastName = $row->clastname;
@@ -3469,16 +3472,16 @@ SELECT tblTrust.DebtorID,  Sum(COALESCE(tblTrust.Intrest,0)+COALESCE(tblTrust.Mi
 
     public function Template(Request $request){
         $parms = tbltemplate::get();
-        return view('accounting\Template\Template',['parms'=>$parms]);
+        return view('accounting/Template/Template',['parms'=>$parms]);
     }
     public function AddTemplate(Request $request){
         $parms = tblparameter::get();
-        return view('accounting\Template\AddTemplate',['parms'=>$parms]);
+        return view('accounting/Template/AddTemplate',['parms'=>$parms]);
     }
     public function EditTemplate(Request $request){
         $template = tbltemplate::where('TemplateID','=',$request->TemplateID)->first();
         $parms = tblparameter::get();
-        return view('accounting\Template\EditTemplate',['parms'=>$parms,'template'=>$template]);
+        return view('accounting/Template/EditTemplate',['parms'=>$parms,'template'=>$template]);
     }
     public function SaveTemplate(Request $request){
         $newTemplate = new tbltemplate();
@@ -3515,7 +3518,7 @@ SELECT tblTrust.DebtorID,  Sum(COALESCE(tblTrust.Intrest,0)+COALESCE(tblTrust.Mi
                 return;
             }
         $this->saveDocGen(tbltemplate::where('TemplateID','=',$request->LetterType)->value('Name'),$request->DebtorID);
-        return view('accounting\Template\PrintTemplate',['html'=>$html]);
+        return view('accounting/Template/PrintTemplate',['html'=>$html]);
     }
     public function saveDocGen($request,$DebtorID){
         $note = new tblnote();
@@ -3633,7 +3636,7 @@ SELECT tblTrust.DebtorID,  Sum(COALESCE(tblTrust.Intrest,0)+COALESCE(tblTrust.Mi
             }
         }
         $Role = Role::get();
-        return view('accounting\Rights\rights',['Role'=>$Role]);
+        return view('accounting/Rights/rights',['Role'=>$Role]);
     }
     public function SaveRights(Request $request){
         $result = rolerightsfield::where('RoleID','=',Auth::user()->is_permission)
@@ -3813,7 +3816,7 @@ if ($fieldName == 'CheckNumb'){
                   ->get();*/
         }
 
-        return view('accounting\User\Users', ['user' => $User]);
+        return view('accounting/User/Users', ['user' => $User]);
     }
     public function addUser(){
         $result = rolerightsfield::where('RoleID','=',Auth::user()->is_permission)
@@ -3828,7 +3831,7 @@ if ($fieldName == 'CheckNumb'){
             }
         }
         $Role = Role::get();
-        return view('accounting\User\AddUser',['Role'=>$Role]);
+        return view('accounting/User/AddUser',['Role'=>$Role]);
     }
     public function saveUser(Request $request){
 
@@ -3877,7 +3880,7 @@ if ($fieldName == 'CheckNumb'){
         }
         $user = User::where('id','=',$request->id)->first();
         $Role = Role::get();
-        return view('accounting\User\EditUser', [
+        return view('accounting/User/EditUser', [
             'user'=>$user,
             'Role'=>$Role]);
     }
@@ -3894,7 +3897,7 @@ if ($fieldName == 'CheckNumb'){
             }
         }
         $products = \DB::table("Users")->get();
-        return view('accounting\User\Users',compact('products'));
+        return view('accounting/User/Users',compact('products'));
     }
     public function delUser(Request $request){
         $result = rolerightsfield::where('RoleID','=',Auth::user()->is_permission)
