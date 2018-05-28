@@ -332,8 +332,7 @@ class MainController extends Controller
         foreach($creditor as $c)
         {
 
-            $mainContact = tblcontacts::where('CreditorID','=',$c->CreditorID)
-                                        ->where('MainManager','=',true)->first();
+            $mainContact = tblcontacts::where('CreditorID','=',$c->CreditorID)->first();
             if($mainContact != null) {
                 $c->mainContact = $mainContact->ClientName;
             }
