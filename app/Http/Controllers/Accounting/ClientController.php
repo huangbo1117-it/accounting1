@@ -46,7 +46,7 @@ class ClientController extends Controller
         //session(['creditorID' => $request->creditorID]);
         //$request->session()->get('creditorID')
         $Creditors = usercreditormaps::where('userid','=',Auth::user()->id)->get();
-        return view('accounting\ClientPortal\ClientPortal',['Creditors' => $Creditors]);
+        return view('accounting/ClientPortal/ClientPortal',['Creditors' => $Creditors]);
     }
     public function globalSearch(Request $request){
 
@@ -164,7 +164,7 @@ GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
         $col = tblcollector::get();
         $saleman = tblsales::get();
         $Creditors = usercreditormaps::where('userid','=',Auth::user()->id)->get();
-        return view('accounting\ClientPortal\TrustReports', ['col' => $col, 'saleman' => $saleman,'Creditors' => $Creditors]);
+        return view('accounting/ClientPortal/TrustReports', ['col' => $col, 'saleman' => $saleman,'Creditors' => $Creditors]);
     }
     public  function showTrustReports(Request $request){
         $dt='';
@@ -184,11 +184,11 @@ GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID;
         If ($request->ReportType == 5) {
             $parms = $dt.'  AND tblDebtors.DebtorID='.$request->DebtorID;
         }
-        $str='SELECT tblCreditor.SaleID,tblDebtors.ClientAcntNumber, tblTrust.ColID, tblCreditor.CreditorID, tblDebtors.DebtorName, tblTrust.DebtorID, tblTrust.TPaymentID, tblTrust.TPaymentType, tblTrust.DateRcvd, tblTrust.CheckNumb, tblTrust.RelDate, tblTrust.ColID, 
+        $str='SELECT tblCreditor.SaleID,tblDebtors.ClientAcntNumber, tblTrust.ColID, tblCreditor.CreditorID, tblDebtors.DebtorName, tblTrust.DebtorID, tblTrust.TPaymentID, tblTrust.TPaymentType, tblTrust.DateRcvd, tblTrust.CheckNumb, tblTrust.RelDate, tblTrust.ColID,
 ClastName & " " & CFirstName AS Collector,
-COALESCE(AgencyGross,0)-COALESCE(AttyFees,0)+COALESCE(Intrest,0)+COALESCE(MiscFees,0) AS AgencyNet, 
+COALESCE(AgencyGross,0)-COALESCE(AttyFees,0)+COALESCE(Intrest,0)+COALESCE(MiscFees,0) AS AgencyNet,
 Month(DateRcvd) AS MonthOfPmnt,
-Year(DateRcvd) AS ThisYear, 
+Year(DateRcvd) AS ThisYear,
 COALESCE(PaymentReceived,0)-COALESCE(MiscFees,0)+COALESCE(CostRef,0) AS NetClient
 FROM tblCreditors tblCreditor LEFT JOIN ((tblTrusts tblTrust RIGHT JOIN tblDebtors ON tblTrust.DebtorID = tblDebtors.DebtorID) LEFT JOIN tblCollectors ON tblTrust.ColID = tblCollectors.ColID) ON tblCreditor.CreditorID = tblDebtors.CreditorID
 WHERE tblTrust.TPaymentType="T" and tblCreditor.CreditorID ="'.$request->Creditor.'" '.$parms.'
@@ -286,14 +286,14 @@ ORDER BY tblTrust.DateRcvd DESC;
                 })->export('xls');
             }
         }
-        return view('accounting\Reports\showTrustReports',['results'=>$results]);
+        return view('accounting/Reports/showTrustReports',['results'=>$results]);
     }
 
     public  function InvoiceReports(Request $request){
         $col = tblcollector::get();
         $sales = tblsales::get();
         $Creditors = usercreditormaps::where('userid','=',Auth::user()->id)->get();
-        return view('accounting\ClientPortal\InvoiceReports',['col'=>$col,'sales'=>$sales,'Creditors' => $Creditors]);
+        return view('accounting/ClientPortal/InvoiceReports',['col'=>$col,'sales'=>$sales,'Creditors' => $Creditors]);
     }
     public  function showInvoiceReports(Request $request){
         $OpenInvoices=False;
@@ -369,12 +369,12 @@ WHERE  tblTrust.TPaymentType="C" and tblDebtors.CreditorID ="'.$request->Credito
                 })->export('xls');
             }
         }
-        return view('accounting\Reports\showInvoiceReports',['results'=>$results]);
+        return view('accounting/Reports/showInvoiceReports',['results'=>$results]);
     }
 
     public  function CreditorsSummary(Request $request){
         $Creditors = usercreditormaps::where('userid','=',Auth::user()->id)->get();
-        return view('accounting\ClientPortal\StatusReports',['Creditors' => $Creditors]);
+        return view('accounting/ClientPortal/StatusReports',['Creditors' => $Creditors]);
     }
     public  function ShowCreditorsSummary(Request $request){
         $filter='';
@@ -389,30 +389,30 @@ WHERE  tblTrust.TPaymentType="C" and tblDebtors.CreditorID ="'.$request->Credito
             $filter=$filter .' and TD.DateEntered >="'.$request->sDate.'" AND TD.DateEntered <="'.$request->eDate.'"';
         }
 
-        $str='SELECT DISTINCT TD.DebtorID, tblCreditor.CompReport, tblCreditor.OpenDate, tblContacts.ClientName, tblContacts.Saltnt, 
+        $str='SELECT DISTINCT TD.DebtorID, tblCreditor.CompReport, tblCreditor.OpenDate, tblContacts.ClientName, tblContacts.Saltnt,
 tblContacts.CFirstName, tblStatus.StatusDesc, tblContacts.CLastName, TD.CreditorID, TD.ColID, TD.ContactID,
  TD.DateEntered, TD.Salutation, TD.DebtorName, TD.DFirstName, TD.DLastName, TD.Street, TD.City, TD.State, TD.Zip, TD.Phone,
-  TD.ClientAcntNumber, TD.StatusID, TD.LastDate, ROUND(TD.AmountPlaced,2)AmountPlaced, TD.FormDate, ROUND(TD.CostAdv,2)CostAdv, 
+  TD.ClientAcntNumber, TD.StatusID, TD.LastDate, ROUND(TD.AmountPlaced,2)AmountPlaced, TD.FormDate, ROUND(TD.CostAdv,2)CostAdv,
   ROUND(qryTotalTrustPerDateLetters.CostRef,2) AS CostRec, TD.SuitFee, TD.Fees,
-   ROUND(COALESCE(qryTotalTrustPerDateLetters.SumOfNetClient,0),2)SumOfNetClient, 
+   ROUND(COALESCE(qryTotalTrustPerDateLetters.SumOfNetClient,0),2)SumOfNetClient,
    ROUND(COALESCE(qryTotalPaymentsLetters.SumOfAmountPaid,0),2)SumOfAmountPaid,
 ROUND(COALESCE(ROUND(COALESCE(qryTotalTrustPerDateLetters.SumOfNetClient,0),2)+ROUND(COALESCE(qryTotalPaymentsLetters.SumOfAmountPaid,0),2) ,0),2)AmountPaid
 ,ROUND(COALESCE(TD.AmountPlaced,0) -COALESCE(COALESCE(qryTotalTrustPerDateLetters.SumOfNetClient,0)+COALESCE(qryTotalPaymentsLetters.SumOfAmountPaid,0) ,0),2) BalanceDue, COALESCE((SumTotalFees),0) AS SumOfTotalFees
-FROM tblCreditors tblCreditor 
+FROM tblCreditors tblCreditor
 	  INNER JOIN tbldebtors TD ON tblCreditor.CreditorID = TD.CreditorID
       INNER JOIN tblContacts ON tblCreditor.CreditorID = tblContacts.CreditorID AND tblContacts.MainManager=True
-       LEFT JOIN tblstatuses tblStatus ON td.StatusID = tblStatus.StatusID 
-       LEFT JOIN (SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.PaymentReceived) AS SumOfAmountPaid FROM tblDebtors LEFT JOIN tblTrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID WHERE (((tblTrust.TPaymentType)="C")) GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID) qryTotalPaymentsLetters 
+       LEFT JOIN tblstatuses tblStatus ON td.StatusID = tblStatus.StatusID
+       LEFT JOIN (SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.PaymentReceived) AS SumOfAmountPaid FROM tblDebtors LEFT JOIN tblTrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID WHERE (((tblTrust.TPaymentType)="C")) GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID) qryTotalPaymentsLetters
       ON TD.DebtorID = qryTotalPaymentsLetters.DebtorID
       LEFT JOIN (SELECT DISTINCTROW tblDebtors.CreditorID, tblTrust.DebtorID, Sum(tblTrust.CostRef) AS CostRef, Sum(tblTrust.PaymentReceived+COALESCE(tblTrust.AttyFees,0)) AS SumOfNetClient FROM tblDebtors LEFT JOIN tblTrusts tblTrust ON tblDebtors.DebtorID = tblTrust.DebtorID
 WHERE (((tblTrust.TPaymentType)="T") AND ((tblTrust.DateRcvd)>"5/29/2000"))
-GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID) qryTotalTrustPerDateLetters 
+GROUP BY tblDebtors.CreditorID, tblTrust.DebtorID) qryTotalTrustPerDateLetters
                    ON TD.DebtorID = qryTotalTrustPerDateLetters.DebtorID
  LEFT JOIN (SELECT tblInvoice.DebtorID, SUM(COALESCE(tblInvoice.Fee1,0)+COALESCE(tblInvoice.Fee2,0)+COALESCE(tblInvoice.Fee3,0)) AS Inv_Fees FROM tblinvoices tblInvoice GROUP BY tblInvoice.DebtorID) qryInvoice_Fees   ON td.DebtorID = qryInvoice_Fees.DebtorID
  LEFT JOIN (SELECT DebtorID,sum(TotalFees)SumTotalFees FROM (SELECT tblInvoice.DebtorID,
 SUM(COALESCE(tblInvoice.Fee1,0)+COALESCE(tblInvoice.Fee2,0)+COALESCE(tblInvoice.Fee3,0)) AS TotalFees FROM tblinvoices tblInvoice GROUP BY tblInvoice.DebtorID
 UNION
-SELECT tblTrust.DebtorID,  Sum(COALESCE(tblTrust.Intrest,0)+COALESCE(tblTrust.MiscFees,0)+COALESCE(tblTrust.AgencyGross,0)) AS TotalFees FROM tbltrusts tblTrust GROUP BY tblTrust.DebtorID)aa )qryTotal_Fees_Final 
+SELECT tblTrust.DebtorID,  Sum(COALESCE(tblTrust.Intrest,0)+COALESCE(tblTrust.MiscFees,0)+COALESCE(tblTrust.AgencyGross,0)) AS TotalFees FROM tbltrusts tblTrust GROUP BY tblTrust.DebtorID)aa )qryTotal_Fees_Final
                  ON td.DebtorID = qryTotal_Fees_Final.DebtorID
                  '.$filter;
 
